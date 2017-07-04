@@ -1,7 +1,6 @@
 package io.jaegertracing.qe.tests;
 
 import java.net.URISyntaxException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 
@@ -104,7 +103,7 @@ public class TestBase {
 
     @BeforeMethod
     public void updateTestStartTime() {
-        testStartTime = Instant.now().toEpochMilli();
+        testStartTime = System.currentTimeMillis() - 1L;
     }
 
     public JaegerRestClient restClient() {
