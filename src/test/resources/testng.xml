@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Jaeger functional tests" verbose="1">
+  <parameter name="flushInterval" value="100" />
+  <parameter name="serviceName" value="from-automation" />
+  <test name="Simple tests">
+    <classes>
+      <class name="io.jaegertracing.qe.tests.BasicSpanTest" />
+      <class name="io.jaegertracing.qe.tests.TagAndDurationTests" />
+      <class name="io.jaegertracing.qe.tests.FirstJaegerTest" />
+    </classes>
+  </test>
+</suite>

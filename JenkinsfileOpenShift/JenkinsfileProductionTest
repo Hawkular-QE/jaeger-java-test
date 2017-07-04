@@ -1,0 +1,40 @@
+pipeline {
+    agent any 
+    stages {
+        stage('Clear jaeger deployments') { 
+            steps { 
+                sh 'oc get all'
+                sh 'oc delete all,template,daemonset -l jaeger-infra'
+                sh 'oc get all'
+            }
+        }
+        stage('Deploy') { 
+            steps { 
+                sh 'oc get all'
+                sh 'oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/production/jaeger-production-template.yml | oc create -n jaeger -f -'
+                sh 'oc get all'
+            }
+        }
+        stage('Verify deployment'){
+            steps {
+                sh 'oc get dc'
+                openshiftVerifyDeployment apiURL: '', authToken: '', depCfg: 'jaeger-query', namespace: '', replicaCount: '1', verbose: 'true', verifyReplicaCount: 'true', waitTime: '3', waitUnit: 'min'
+                openshiftVerifyDeployment apiURL: '', authToken: '', depCfg: 'jaeger-collector', namespace: '', replicaCount: '1', verbose: 'true', verifyReplicaCount: 'true', waitTime: '3', waitUnit: 'min'
+            }
+        }
+        stage('Verify services'){
+            steps{
+                sh 'oc get services'
+                openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-query', verbose: 'true'
+                openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-collector', verbose: 'true'
+            }
+        }
+        stage('Delete all') {
+            steps {
+                sh 'oc get all'
+                sh 'oc delete all,template,daemonset -l jaeger-infra'
+                sh 'oc get all'
+            }
+        }
+    }
+}
