@@ -1,4 +1,4 @@
-package io.jaegertracing.qe.tests;
+package io.jaegertracing.qe;
 
 import java.net.URISyntaxException;
 import java.util.List;

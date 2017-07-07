@@ -5,6 +5,8 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import io.jaegertracing.qe.TestBase;
+
 import io.jaegertracing.qe.rest.model.Trace;
 import io.opentracing.Span;
 
