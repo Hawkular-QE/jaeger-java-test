@@ -96,3 +96,5 @@ git clone https://github.com/Hawkular-QE/jaeger-java-test
 cd jaeger-java-test
 mvn test
 ```
+
+Test this change
