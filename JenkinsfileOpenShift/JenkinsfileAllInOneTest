@@ -29,7 +29,7 @@ pipeline {
         }
         stage('Functional test'){
             steps{
-                withEnv(["JAVA_HOME=${ tool 'jdk' }", "PATH+MAVEN=${tool 'maven'}/bin:${env.JAVA_HOME}/bin"]) {
+                withEnv(["JAVA_HOME=${ tool 'jdk8' }", "PATH+MAVEN=${tool 'maven-3.5.0'}/bin:${env.JAVA_HOME}/bin"]) {
                     sh '''
                         export JAEGER_QUERY_HOST="jaeger-query.jaeger.svc"
                         export JAEGER_AGENT_HOST="jaeger-agent.jaeger.svc"
