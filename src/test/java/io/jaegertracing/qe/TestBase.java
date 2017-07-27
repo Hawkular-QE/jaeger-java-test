@@ -143,7 +143,9 @@ public class TestBase {
     }
 
     public void waitForFlush() {
-        sleep(testData.getConfig().getFlushInterval() + 1L);
+    	// when we go with production Cassandra database, needs more time to flush on database
+    	// adding 1000 milliseconds delay for this action
+        sleep(testData.getConfig().getFlushInterval() + 1000L);
     }
 
     public void sleep(long milliseconds) {
