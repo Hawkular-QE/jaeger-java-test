@@ -40,6 +40,7 @@ public class MyListener implements ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
+        _logger.debug("***************************************\n\n", result.getName());
         _logger.debug("Test: starting >> [{}]", result.getName());
     }
 

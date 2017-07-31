@@ -24,13 +24,13 @@ import com.uber.jaeger.senders.UdpSender;
 
 import io.jaegertracing.qe.api.model.JaegerConfiguration;
 import io.jaegertracing.qe.api.model.TestData;
-
 import io.jaegertracing.qe.queryserver.JaegerQueryImpl;
 import io.jaegertracing.qe.queryserver.IJaegerQuery;
 import io.jaegertracing.qe.rest.JaegerRestClient;
 import io.jaegertracing.qe.rest.model.Criteria;
 import io.jaegertracing.qe.rest.model.Span;
 import io.jaegertracing.qe.rest.model.Tag;
+import io.jaegertracing.qe.rest.model.Trace;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,41 +57,48 @@ public class TestBase {
     }
 
     @BeforeSuite
-    @Parameters({ "jaegerServerHost", "jaegerQueryProtocol", "jaegerAgentHost", "jaegerZipkinThriftPort",
-            "jaegerAgentCompactPort", "jaegerAgentBinaryPort", "jaegerZipkinCollectorPort", "jaegerQueryPort",
-            "flushInterval", "serviceName" })
-    public void updateTestData(ITestContext context, @Optional String jaegerServerHost,
-            @Optional String jaegerQueryProtocol, @Optional String jaegerAgentHost,
-            @Optional Integer jaegerZipkinThriftPort, @Optional Integer jaegerAgentCompactPort,
-            @Optional Integer jaegerAgentBinaryPort, @Optional Integer jaegerZipkinCollectorPort,
-            @Optional Integer jaegerQueryPort, @Optional Integer flushInterval, @Optional String serviceName) {
+    @Parameters({ "jaegerServerHost", "jaegerQueryProtocol", "jaegerAgentHost",
+            "jaegerZipkinThriftPort", "jaegerAgentCompactPort",
+            "jaegerAgentBinaryPort", "jaegerZipkinCollectorPort",
+            "jaegerQueryPort", "flushInterval", "serviceName" })
+    public void updateTestData(ITestContext context,
+            @Optional String jaegerServerHost,
+            @Optional String jaegerQueryProtocol,
+            @Optional String jaegerAgentHost,
+            @Optional Integer jaegerZipkinThriftPort,
+            @Optional Integer jaegerAgentCompactPort,
+            @Optional Integer jaegerAgentBinaryPort,
+            @Optional Integer jaegerZipkinCollectorPort,
+            @Optional Integer jaegerQueryPort, @Optional Integer flushInterval,
+            @Optional String serviceName) {
         testData = TestData
                 .builder()
                 .serviceName(serviceName)
                 .config(JaegerConfiguration
                         .builder()
-                        .serverHost(jaegerServerHost == null ?
-                                getEnv("JAEGER_QUERY_HOST", "localhost") : jaegerServerHost)
-                        .serverQueryProtocol(jaegerQueryProtocol == null ?
-                                getEnv("JAEGER_QUERY_PROTOCOL", "http") : jaegerQueryProtocol)
-                        .agentHost(jaegerAgentHost == null ?
-                                getEnv("JAEGER_AGENT_HOST", "localhost") : jaegerAgentHost)
-                        .queryPort(jaegerQueryPort == null ?
-                                Integer.valueOf(getEnv("JAEGER_PORT_QUERY_HTTP", "16686")) : jaegerQueryPort)
-                        .agentZipkinThriftPort(jaegerZipkinThriftPort == null ?
-                                Integer.valueOf(getEnv("JAEGER_PORT_AGENT_ZIPKIN_THRIFT", "5775"))
-                                : jaegerZipkinThriftPort)
-                        .agentCompactPort(jaegerAgentCompactPort == null ?
-                                Integer.valueOf(getEnv("JAEGER_PORT_AGENT_COMPACT", "6831"))
-                                : jaegerAgentCompactPort)
-                        .agentBinaryPort(jaegerAgentBinaryPort == null ?
-                                Integer.valueOf(getEnv("JAEGER_PORT_AGENT_BINARY", "6832"))
-                                : jaegerAgentBinaryPort)
-                        .zipkinCollectorPort(jaegerZipkinCollectorPort == null ?
-                                Integer.valueOf(getEnv("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268"))
-                                : jaegerZipkinCollectorPort)
-                        .flushInterval(flushInterval).build())
-                .build();
+                        .serverHost(
+                                jaegerServerHost == null ? getEnv("JAEGER_QUERY_HOST", "localhost") : jaegerServerHost)
+                        .serverQueryProtocol(jaegerQueryProtocol == null ? getEnv("JAEGER_QUERY_PROTOCOL", "http")
+                                : jaegerQueryProtocol)
+                        .agentHost(
+                                jaegerAgentHost == null ? getEnv("JAEGER_AGENT_HOST", "localhost") : jaegerAgentHost)
+                        .queryPort(
+                                jaegerQueryPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_QUERY_HTTP", "16686"))
+                                        : jaegerQueryPort)
+                        .agentZipkinThriftPort(
+                                jaegerZipkinThriftPort == null ? Integer.valueOf(getEnv(
+                                        "JAEGER_PORT_AGENT_ZIPKIN_THRIFT", "5775"))
+                                        : jaegerZipkinThriftPort)
+                        .agentCompactPort(
+                                jaegerAgentCompactPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_COMPACT",
+                                        "6831")) : jaegerAgentCompactPort)
+                        .agentBinaryPort(
+                                jaegerAgentBinaryPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_BINARY",
+                                        "6832")) : jaegerAgentBinaryPort)
+                        .zipkinCollectorPort(
+                                jaegerZipkinCollectorPort == null ? Integer.valueOf(getEnv(
+                                        "JAEGER_PORT_ZIPKIN_COLLECTOR", "14268")) : jaegerZipkinCollectorPort)
+                        .flushInterval(flushInterval).build()).build();
     }
 
     private String getEnv(String key, String defaultValue) {
@@ -112,8 +119,7 @@ public class TestBase {
                 restClient = JaegerRestClient
                         .builder()
                         .uri(testData.getConfig().getServerQueryProtocol() + "://"
-                                + testData.getConfig().getServerHost()
-                                + ":" + testData.getConfig().getQueryPort())
+                                + testData.getConfig().getServerHost() + ":" + testData.getConfig().getQueryPort())
                         .build();
             } catch (URISyntaxException ex) {
                 _logger.error("Exception,", ex);
@@ -124,15 +130,16 @@ public class TestBase {
 
     public IJaegerQuery jaegerQuery() {
         if (jaegerQuery == null) {
-            jaegerQuery = new JaegerQueryImpl(restClient(), testData.getServiceName());
+            jaegerQuery = new JaegerQueryImpl(restClient(),
+                    testData.getServiceName());
         }
         return jaegerQuery;
     }
 
     public Tracer tracer() {
         if (tracer == null) {
-            Sender sender = new UdpSender(testData.getConfig().getAgentHost(), testData.getConfig()
-                    .getAgentCompactPort(), 1024);
+            Sender sender = new UdpSender(testData.getConfig().getAgentHost(),
+                    testData.getConfig().getAgentCompactPort(), 1024);
             Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
             Reporter reporter = new RemoteReporter(sender, testData.getConfig().getFlushInterval(), 100, metrics);
             Sampler sampler = new ProbabilisticSampler(1.0);
@@ -143,9 +150,7 @@ public class TestBase {
     }
 
     public void waitForFlush() {
-    	// when we go with production Cassandra database, needs more time to flush on database
-    	// adding 1000 milliseconds delay for this action
-        sleep(testData.getConfig().getFlushInterval() + 1000L);
+        sleep(testData.getConfig().getFlushInterval() + 10L);
     }
 
     public void sleep(long milliseconds) {
@@ -171,8 +176,7 @@ public class TestBase {
                         tagFound = true;
                     }
                 } else if (value instanceof Boolean) {
-                    if (((Boolean) value).booleanValue() == (((Boolean) received)
-                            .booleanValue())) {
+                    if (((Boolean) value).booleanValue() == (((Boolean) received).booleanValue())) {
                         tagFound = true;
                     }
                 } else if (((String) value).equals(received)) {
@@ -207,5 +211,22 @@ public class TestBase {
     @AfterSuite
     protected void afterClass() {
         waitForFlush();
+    }
+
+    protected List<Trace> getTraceList(String operationName, Long testStartTime, int traceCount) {
+        return getTraceList(operationName, testStartTime, null, traceCount);
+    }
+
+    protected List<Trace> getTraceList(String operationName, Long testStartTime, Long testEndTime, int traceCount) {
+        List<Trace> traces = null;
+        for (long waitTime = 30 * 1000L; waitTime > 0;) {
+            traces = jaegerQuery().listTrace(null, testStartTime, testEndTime);
+            if (traces.size() >= traceCount) {
+                return traces;
+            }
+            sleep(1000L);//Sleep 1 second
+            waitTime -= 1000L;
+        }
+        return traces;
     }
 }

@@ -40,7 +40,7 @@ public class FirstJaegerTest extends TestBase {
         span.finish();
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
         assertEquals(traces.size(), 1, "Expected 1 trace");
 
         List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
@@ -80,7 +80,7 @@ public class FirstJaegerTest extends TestBase {
 
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
         assertEquals(traces.size(), 1, "Expected 1 trace");
 
         List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
@@ -96,7 +96,7 @@ public class FirstJaegerTest extends TestBase {
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
         long endTime = 0;
-        long tracesCount = 0;
+        int tracesCount = 0;
         for (int i = 0; i < 5; i++) {
             if (i == 3) {
                 endTime = System.currentTimeMillis();
@@ -113,7 +113,8 @@ public class FirstJaegerTest extends TestBase {
 
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(null, testStartTime, endTime);
+        //Adding 1 millisecond on end time to satisfy less than(<) condition
+        List<Trace> traces = getTraceList(operationName, testStartTime, endTime + 1L, tracesCount);
         assertEquals(traces.size(), tracesCount, "Expected 3 traces");
         // TODO more assertions here ?
     }
@@ -141,7 +142,7 @@ public class FirstJaegerTest extends TestBase {
 
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(null, testStartTime);
+        List<Trace> traces = getTraceList(null, testStartTime, 2);
         assertEquals(traces.size(), 2, "Expected 2 traces");
 
         // TODO more assertions here....
@@ -152,7 +153,7 @@ public class FirstJaegerTest extends TestBase {
     /**
      * Test span log
      */
-    @Test(alwaysRun = false)
+    @Test
     //for now skip this test. TODO: fix this test failure 
     public void spanDotLogIsBrokenTest() {
         String operationName = "spanDotLogIsBrokenTest";
@@ -162,8 +163,7 @@ public class FirstJaegerTest extends TestBase {
 
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
-
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
         assertEquals(traces.size(), 1, "Expected 1 trace");
 
         //TODO: validate log
@@ -184,8 +184,7 @@ public class FirstJaegerTest extends TestBase {
         span.finish();
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
-
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
         assertEquals(traces.size(), 1, "Expected 1 trace");
         List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
         assertEquals(1, spans.size(), "Expected only 1 span");
