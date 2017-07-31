@@ -55,7 +55,7 @@ public class TagAndDurationTests extends TestBase {
 
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
 
         assertEquals(traces.size(), 1, "Expected 1 trace");
 
@@ -82,7 +82,7 @@ public class TagAndDurationTests extends TestBase {
         span.finish();
         waitForFlush();
 
-        List<Trace> traces = jaegerQuery().listTrace(operationName, testStartTime);
+        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
 
         assertEquals(traces.size(), 1, "Expected 1 trace");
 
