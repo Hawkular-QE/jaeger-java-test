@@ -154,7 +154,6 @@ public class FirstJaegerTest extends TestBase {
      * Test span log
      */
     @Test
-    //for now skip this test. TODO: fix this test failure 
     public void spanDotLogIsBrokenTest() {
         String operationName = "spanDotLogIsBrokenTest";
         Span span = tracer().buildSpan(operationName).startManual();
