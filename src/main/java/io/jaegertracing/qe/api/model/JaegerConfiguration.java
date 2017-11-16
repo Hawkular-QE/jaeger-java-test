@@ -25,7 +25,9 @@ public class JaegerConfiguration {
     private Integer agentCompactPort;
     private Integer agentBinaryPort;
     private Integer zipkinCollectorPort;
+    private String collectorHost;
     private Integer flushInterval;
+    private String useCollectorOrAgent;
 
     public Integer getAgentZipkinThriftPort() {
         return agentZipkinThriftPort != null ? agentZipkinThriftPort : 5775;
@@ -61,5 +63,9 @@ public class JaegerConfiguration {
 
     public Integer getFlushInterval() {
         return flushInterval != null ? flushInterval : 100;
+    }
+
+    public boolean useCollector() {
+        return useCollectorOrAgent.equalsIgnoreCase("collector");
     }
 }

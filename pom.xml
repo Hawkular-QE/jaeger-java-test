@@ -23,7 +23,7 @@
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
 
     <logback.version>1.2.2</logback.version>
-    <com.uber.jaeger.version>0.20.5</com.uber.jaeger.version>
+    <com.uber.jaeger.version>0.21.0</com.uber.jaeger.version>
     <commons-io.version>2.4</commons-io.version>
     <guava.version>19.0</guava.version>
     <resteasy.version>3.1.3.Final</resteasy.version>
