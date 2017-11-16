@@ -86,7 +86,7 @@ public class TestBase {
         jaegerAgentCompactPort  = (jaegerAgentCompactPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_COMPACT", "6831")) : jaegerAgentCompactPort);
         jaegerAgentBinaryPort = (jaegerAgentBinaryPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_BINARY", "6832")) : jaegerAgentBinaryPort);
         jaegerZipkinCollectorPort = (jaegerZipkinCollectorPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268")) : jaegerZipkinCollectorPort);
-        useCollectorOrAgent = (useCollectorOrAgent == null ? getEnv("USER_COLLECTOR_OR_AGENT", "collector") : useCollectorOrAgent);
+        useCollectorOrAgent = (useCollectorOrAgent == null ? getEnv("USE_COLLECTOR_OR_AGENT", "collector") : useCollectorOrAgent);
 
         testData = TestData
                 .builder()
