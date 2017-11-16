@@ -148,6 +148,8 @@ public class TestBase {
         if (tracer == null) {
             if (jaegerConfiguration.useCollector()) {
                 String httpEndpoint = "http://" + jaegerConfiguration.getCollectorHost() + ":" + jaegerConfiguration.getZipkinCollectorPort() + "/api/traces";
+                _logger.info("**** Using collector endpoint [" + httpEndpoint + "]");
+
                 sender = new HttpSender(httpEndpoint);
                 _logger.info(">>>> Using JAEGER collector on host " + jaegerConfiguration.getCollectorHost() + " port " + jaegerConfiguration.getZipkinCollectorPort());
             } else {
