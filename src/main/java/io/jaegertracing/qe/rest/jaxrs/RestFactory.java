@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 public class RestFactory<T> {
-    private static final Logger _logger = LoggerFactory.getLogger(RestFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestFactory.class);
 
     private final ClassLoader classLoader;
     private Class<T> apiClassType;
@@ -106,7 +106,7 @@ public class RestFactory<T> {
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
             httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            _logger.error("Failed to create HTTPClient: {}", e);
+            logger.error("Failed to create HTTPClient: {}", e);
         }
 
         return httpclient;

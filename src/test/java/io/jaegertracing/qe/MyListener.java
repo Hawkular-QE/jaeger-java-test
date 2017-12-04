@@ -15,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MyListener implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
-        //_logger.debug("Test: completed.. >> [{}]", context.getName());
+        //logger.debug("Test: completed.. >> [{}]", context.getName());
     }
 
     @Override
     public void onStart(ITestContext context) {
-        //_logger.debug("Test: starting.. >> [{}]", context.getName());
+        //logger.debug("Test: starting.. >> [{}]", context.getName());
     }
 
     @Override
@@ -30,23 +30,23 @@ public class MyListener implements ITestListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
-        _logger.debug("Test: failure >> [{}]", result.getName());
+        logger.debug("Test: failure >> [{}]", result.getName());
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        _logger.debug("Test: skipping >> [{}]", result.getName());
+        logger.debug("Test: skipping >> [{}]", result.getName());
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        _logger.debug("***************************************\n\n", result.getName());
-        _logger.debug("Test: starting >> [{}]", result.getName());
+        logger.debug("***************************************\n\n", result.getName());
+        logger.debug("Test: starting >> [{}]", result.getName());
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        _logger.debug("Test: success >> [{}]", result.getName());
+        logger.debug("Test: success >> [{}]", result.getName());
     }
 
 }
