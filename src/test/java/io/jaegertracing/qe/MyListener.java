@@ -30,23 +30,22 @@ public class MyListener implements ITestListener {
 
     @Override
     public void onTestFailure(ITestResult result) {
-        logger.debug("Test: failure >> [{}]", result.getName());
+        logger.warn("Test: failure: [{}]", result.getName());
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        logger.debug("Test: skipping >> [{}]", result.getName());
+        logger.info("Test: skipping: [{}]", result.getName());
     }
 
     @Override
     public void onTestStart(ITestResult result) {
-        logger.debug("***************************************\n\n", result.getName());
-        logger.debug("Test: starting >> [{}]", result.getName());
+        logger.info("Test: starting: [{}]", result.getName());
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        logger.debug("Test: success >> [{}]", result.getName());
+        logger.debug("Test: success: [{}]", result.getName());
     }
 
 }

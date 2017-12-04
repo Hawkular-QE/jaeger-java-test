@@ -18,8 +18,8 @@ public class ResponseLoggingFilter implements ClientResponseFilter {
     @Override
     public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("<< Response headers:{}", responseContext.getHeaders());
-            LOG.debug("<< Status -> code:{}, message:{}",
+            LOG.debug("Response headers:{}", responseContext.getHeaders());
+            LOG.debug("Status -> code:{}, message:{}",
                           responseContext.getStatusInfo().getStatusCode(),
                           responseContext.getStatusInfo().getReasonPhrase());
         }

@@ -1,19 +1,19 @@
 package io.jaegertracing.qe.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import io.jaegertracing.qe.rest.jaxrs.Empty;
 import io.jaegertracing.qe.rest.jaxrs.ResponseCodes;
 import io.jaegertracing.qe.rest.jaxrs.fasterxml.jackson.ClientObjectMapper;
-
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.Arrays;
 
 public class DefaultClientResponse<T> implements ClientResponse<T>  {
 
@@ -121,7 +121,7 @@ public class DefaultClientResponse<T> implements ClientResponse<T>  {
         builder.append("Status Code:").append(getStatusCode())
             .append(", Is Success:").append(isSuccess())
             .append(", Error Message:").append(getErrorMsg() == null ? "-" : getErrorMsg())
-            .append(", Raw Entity:").append(getRawEntity());
+            .append(", Raw Entity:").append(prettyPrintJson(getRawEntity()));
 
         if (getEntity() instanceof Object[]) {
             builder.append(", Entity:").append(Arrays.toString((T[])getEntity()));
@@ -131,4 +131,25 @@ public class DefaultClientResponse<T> implements ClientResponse<T>  {
 
         return builder.toString();
     }
+
+    /**
+     * Return a formatted JSON String
+     * @param json
+     * @return
+     * @throws JsonProcessingException
+     */
+    private String prettyPrintJson(String json)  {
+        try {
+            ObjectMapper objectMapper = new ClientObjectMapper();
+            JsonNode blah = objectMapper.readTree(json);
+            ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
+            String result = writer.writeValueAsString(blah);
+            return result;
+        } catch (IOException e) {
+            LOG.error(e.getMessage(), e);
+            return json;
+        }
+    }
+
+
 }

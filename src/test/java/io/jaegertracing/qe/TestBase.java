@@ -148,13 +148,13 @@ public class TestBase {
         if (tracer == null) {
             if (jaegerConfiguration.useCollector()) {
                 String httpEndpoint = "http://" + jaegerConfiguration.getCollectorHost() + ":" + jaegerConfiguration.getZipkinCollectorPort() + "/api/traces";
-                logger.info("**** Using collector endpoint [" + httpEndpoint + "]");
+                logger.info("Using collector endpoint [" + httpEndpoint + "]");
 
                 sender = new HttpSender(httpEndpoint);
-                logger.info(">>>> Using JAEGER collector on host " + jaegerConfiguration.getCollectorHost() + " port " + jaegerConfiguration.getZipkinCollectorPort());
+                logger.info("Using JAEGER collector on host " + jaegerConfiguration.getCollectorHost() + " port " + jaegerConfiguration.getZipkinCollectorPort());
             } else {
                 sender = new UdpSender(jaegerConfiguration.getAgentHost(), jaegerConfiguration.getAgentCompactPort(), 1024);
-                logger.info(">>>> Using JAEGER agent on host " + jaegerConfiguration.getAgentHost() + " port " + jaegerConfiguration.getAgentCompactPort());
+                logger.info("Using JAEGER agent on host " + jaegerConfiguration.getAgentHost() + " port " + jaegerConfiguration.getAgentCompactPort());
             }
 
             Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
@@ -172,7 +172,7 @@ public class TestBase {
 
     public void sleep(long milliseconds) {
         try {
-            logger.debug("Sleeping >> {} ms", milliseconds);
+            logger.debug("Sleeping {} ms", milliseconds);
             Thread.sleep(milliseconds);
         } catch (InterruptedException ex) {
             logger.error("Exception,", ex);

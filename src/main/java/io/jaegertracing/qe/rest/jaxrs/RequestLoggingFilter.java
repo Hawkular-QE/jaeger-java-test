@@ -22,10 +22,10 @@ public class RequestLoggingFilter implements ClientRequestFilter {
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug(">> HTTP: {}", requestContext.getMethod());
-            LOG.debug(">> URI: {}", requestContext.getUri());
-            LOG.debug(">> Headers: {}", requestContext.getHeaders());
-            LOG.debug(">> Data: {}", OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
+            LOG.debug("HTTP: {}", requestContext.getMethod());
+            LOG.debug("URI: {}", requestContext.getUri());
+            LOG.debug("Headers: {}", requestContext.getHeaders());
+            LOG.debug("Data: {}", OBJECT_MAPPER.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(requestContext.getEntity()));
         }
     }
