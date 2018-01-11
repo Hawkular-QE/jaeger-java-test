@@ -1,18 +1,5 @@
 package io.jaegertracing.qe;
 
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Random;
-
-import com.uber.jaeger.senders.HttpSender;
-import org.testng.Assert;
-import org.testng.ITestContext;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
-
 import com.uber.jaeger.metrics.Metrics;
 import com.uber.jaeger.metrics.NullStatsReporter;
 import com.uber.jaeger.metrics.StatsFactoryImpl;
@@ -20,13 +7,11 @@ import com.uber.jaeger.reporters.RemoteReporter;
 import com.uber.jaeger.reporters.Reporter;
 import com.uber.jaeger.samplers.ProbabilisticSampler;
 import com.uber.jaeger.samplers.Sampler;
+import com.uber.jaeger.senders.HttpSender;
 import com.uber.jaeger.senders.Sender;
 import com.uber.jaeger.senders.UdpSender;
-
-import io.jaegertracing.qe.api.model.JaegerConfiguration;
-import io.jaegertracing.qe.api.model.TestData;
-import io.jaegertracing.qe.queryserver.JaegerQueryImpl;
 import io.jaegertracing.qe.queryserver.IJaegerQuery;
+import io.jaegertracing.qe.queryserver.JaegerQueryImpl;
 import io.jaegertracing.qe.rest.JaegerRestClient;
 import io.jaegertracing.qe.rest.model.Criteria;
 import io.jaegertracing.qe.rest.model.Span;
@@ -34,6 +19,14 @@ import io.jaegertracing.qe.rest.model.Tag;
 import io.jaegertracing.qe.rest.model.Trace;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.Assert;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
+
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -41,77 +34,29 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TestBase {
-    protected static TestData testData = null;
     protected Long testStartTime = null;
     private static Tracer tracer = null;
     private static JaegerRestClient restClient = null;
     private static IJaegerQuery jaegerQuery = null;
-
     static final Random RANDOM = new Random();
-
     public static Long nextLong(long start, long end) {
         return start + ((long) (RANDOM.nextDouble() * (end - start)));
     }
-
     public static Long nextLong(long end) {
         return nextLong(0L, end);
     }
 
-    @BeforeSuite
-    @Parameters({ "jaegerServerHost", "jaegerQueryProtocol", "jaegerAgentHost", "jaegerCollectorHost",
-            "jaegerZipkinThriftPort", "jaegerAgentCompactPort",
-            "jaegerAgentBinaryPort", "jaegerZipkinCollectorPort",
-            "jaegerQueryPort", "flushInterval", "useCollectorOrAgent", "serviceName" })
-    public void updateTestData(ITestContext context,
-            @Optional String jaegerServerHost,
-            @Optional String jaegerQueryProtocol,
-            @Optional String jaegerAgentHost,
-            @Optional String jaegerCollectorHost,
-            @Optional Integer jaegerZipkinThriftPort,
-            @Optional Integer jaegerAgentCompactPort,
-            @Optional Integer jaegerAgentBinaryPort,
-            @Optional Integer jaegerZipkinCollectorPort,
-            @Optional Integer jaegerQueryPort,
-            @Optional Integer flushInterval,
-            @Optional String useCollectorOrAgent,
-            @Optional String serviceName) {
-
-        jaegerServerHost = (jaegerServerHost == null ? getEnv("JAEGER_QUERY_HOST", "localhost") : jaegerServerHost);
-        jaegerQueryProtocol = (jaegerQueryProtocol == null ? getEnv("JAEGER_QUERY_PROTOCOL", "http") : jaegerQueryProtocol);
-        jaegerAgentHost = (jaegerAgentHost == null ? getEnv("JAEGER_AGENT_HOST", "localhost") : jaegerAgentHost);
-        jaegerQueryPort = (jaegerQueryPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_QUERY_HTTP", "16686")) : jaegerQueryPort);
-        jaegerCollectorHost = (jaegerCollectorHost == null ? getEnv("JAEGER_COLLECTOR_HOST", "localhost") : jaegerCollectorHost);
-
-        jaegerZipkinThriftPort = (jaegerZipkinThriftPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_ZIPKIN_THRIFT", "5775")): jaegerZipkinThriftPort);
-        jaegerAgentCompactPort  = (jaegerAgentCompactPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_COMPACT", "6831")) : jaegerAgentCompactPort);
-        jaegerAgentBinaryPort = (jaegerAgentBinaryPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_AGENT_BINARY", "6832")) : jaegerAgentBinaryPort);
-        jaegerZipkinCollectorPort = (jaegerZipkinCollectorPort == null ? Integer.valueOf(getEnv("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268")) : jaegerZipkinCollectorPort);
-        useCollectorOrAgent = (useCollectorOrAgent == null ? getEnv("USE_COLLECTOR_OR_AGENT", "collector") : useCollectorOrAgent);
-
-        testData = TestData
-                .builder()
-                .serviceName(serviceName)
-                .config(JaegerConfiguration
-                        .builder()
-                        .serverHost(jaegerServerHost)
-                        .serverQueryProtocol(jaegerQueryProtocol)
-                        .agentHost(jaegerAgentHost)
-                        .queryPort(jaegerQueryPort)
-                        .collectorHost(jaegerCollectorHost)
-                        .agentZipkinThriftPort(jaegerZipkinThriftPort)
-                        .agentCompactPort(jaegerAgentCompactPort)
-                        .agentBinaryPort(jaegerAgentBinaryPort)
-                        .zipkinCollectorPort(jaegerZipkinCollectorPort)
-                        .useCollectorOrAgent(useCollectorOrAgent)
-                        .flushInterval(flushInterval).build()).build();
-    }
-
-    private String getEnv(String key, String defaultValue) {
-        if (System.getenv(key) != null) {
-            return System.getenv(key);
-        }
-        return defaultValue;
-    }
+    private static Map<String, String> envs = System.getenv();
+    private static final Integer JAEGER_AGENT_COMPACT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_COMPACT_PORT", "6831"));
+    private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "localhost");
+    private static final String JAEGER_COLLECTOR_HOST  = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "localhost");
+    private static Integer JAEGER_FLUSH_INTERVAL = Integer.valueOf(envs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
+    private static final String JAEGER_QUERY_HOST = envs.getOrDefault("JAEGER_QUERY_HOST", "localhost");
+    private static final String JAEGER_PORT_AGENT_ZIPKIN_THRIFT = envs.getOrDefault("JAEGER_PORT_AGENT_ZIPKIN_THRIFT", "5775");
+    private static final String JAEGER_PORT_QUERY_HTTP  = envs.getOrDefault("JAEGER_PORT_QUERY_HTTP", "16686");
+    private static final String JAEGER_PORT_ZIPKIN_COLLECTOR = envs.getOrDefault("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268");
+    private static final String SERVICE_NAME  = envs.getOrDefault("SERVICE_NAME", "qe");
+    private static final String USE_COLLECTOR_OR_AGENT = envs.getOrDefault("USE_COLLECTOR_OR_AGENT", "collector");
 
     @BeforeMethod
     public void updateTestStartTime() {
@@ -123,8 +68,7 @@ public class TestBase {
             try {
                 restClient = JaegerRestClient
                         .builder()
-                        .uri(testData.getConfig().getServerQueryProtocol() + "://"
-                                + testData.getConfig().getServerHost() + ":" + testData.getConfig().getQueryPort())
+                        .uri("http://" + JAEGER_QUERY_HOST + ":" + JAEGER_PORT_QUERY_HTTP)
                         .build();
             } catch (URISyntaxException ex) {
                 logger.error("Exception,", ex);
@@ -135,39 +79,34 @@ public class TestBase {
 
     public IJaegerQuery jaegerQuery() {
         if (jaegerQuery == null) {
-            jaegerQuery = new JaegerQueryImpl(restClient(),
-                    testData.getServiceName());
+            jaegerQuery = new JaegerQueryImpl(restClient(), SERVICE_NAME);
         }
         return jaegerQuery;
     }
 
     public Tracer tracer() {
         Sender sender;
-        JaegerConfiguration jaegerConfiguration = testData.getConfig();
 
         if (tracer == null) {
-            if (jaegerConfiguration.useCollector()) {
-                String httpEndpoint = "http://" + jaegerConfiguration.getCollectorHost() + ":" + jaegerConfiguration.getZipkinCollectorPort() + "/api/traces";
+            if (USE_COLLECTOR_OR_AGENT.equals("collector")) {
+                String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_PORT_ZIPKIN_COLLECTOR + "/api/traces";
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
-
                 sender = new HttpSender(httpEndpoint);
-                logger.info("Using JAEGER collector on host " + jaegerConfiguration.getCollectorHost() + " port " + jaegerConfiguration.getZipkinCollectorPort());
             } else {
-                sender = new UdpSender(jaegerConfiguration.getAgentHost(), jaegerConfiguration.getAgentCompactPort(), 1024);
-                logger.info("Using JAEGER agent on host " + jaegerConfiguration.getAgentHost() + " port " + jaegerConfiguration.getAgentCompactPort());
+                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_COMPACT_PORT, 1024);
+                logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_COMPACT_PORT);
             }
 
             Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
-            Reporter reporter = new RemoteReporter(sender, jaegerConfiguration.getFlushInterval(), 100, metrics);
+            Reporter reporter = new RemoteReporter(sender, JAEGER_FLUSH_INTERVAL, 100, metrics);
             Sampler sampler = new ProbabilisticSampler(1.0);
-            tracer = new com.uber.jaeger.Tracer.Builder(testData.getServiceName(), reporter, sampler).build();
-            logger.debug("Tracer details[{}]", testData);
+            tracer = new com.uber.jaeger.Tracer.Builder(SERVICE_NAME, reporter, sampler).build();
         }
         return tracer;
     }
 
     public void waitForFlush() {
-        sleep(testData.getConfig().getFlushInterval() + 10L);
+        sleep(JAEGER_FLUSH_INTERVAL + 10L);
     }
 
     public void sleep(long milliseconds) {

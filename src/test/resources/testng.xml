@@ -4,8 +4,6 @@
   <listeners>
     <listener class-name="io.jaegertracing.qe.MyListener"></listener>
   </listeners>
-  <parameter name="flushInterval" value="100" />
-  <parameter name="serviceName" value="from-automation" />
   <test name="Simple tests">
     <classes>
       <class name="io.jaegertracing.qe.tests.BasicSpanTest" />
