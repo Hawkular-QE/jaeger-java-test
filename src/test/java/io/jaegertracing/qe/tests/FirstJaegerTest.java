@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -91,7 +92,9 @@ public class FirstJaegerTest extends TestBase {
     /**
      * A simple test of the start and end options when fetching traces.
      *
+     * For @Ignore see https://github.com/Hawkular-QE/jaeger-java-test/issues/14
      */
+    @Ignore
     @Test
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
