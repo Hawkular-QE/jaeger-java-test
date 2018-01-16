@@ -96,26 +96,23 @@ public class FirstJaegerTest extends TestBase {
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
         long endTime = 0;
-        int tracesCount = 0;
+        int expectedTraceCount = 3;
         for (int i = 0; i < 5; i++) {
-            if (i == 3) {
+            if (i == expectedTraceCount) {
                 endTime = System.currentTimeMillis();
                 sleep(50);
             }
             Span testSpan = tracer().buildSpan(operationName)
                     .withTag("startEndTestSpan", i)
                     .startManual();
-            if (endTime == 0) {
-                tracesCount++;
-            }
             testSpan.finish();
         }
 
         waitForFlush();
 
         //Adding 1 millisecond on end time to satisfy less than(<) condition
-        List<Trace> traces = getTraceList(operationName, testStartTime, endTime + 1L, tracesCount);
-        assertEquals(traces.size(), tracesCount, "Expected 3 traces");
+        List<Trace> traces = getTraceList(operationName, testStartTime, endTime + 1L, expectedTraceCount);   // TODO a possible problem is that we get too many traces, how to deal with that?
+        assertEquals(traces.size(), expectedTraceCount, "Expected " + expectedTraceCount + " traces");
         // TODO more assertions here ?
     }
 
