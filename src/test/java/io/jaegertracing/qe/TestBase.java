@@ -174,9 +174,11 @@ public class TestBase {
     }
 
     protected List<Trace> getTraceList(String operationName, Long testStartTime, Long testEndTime, int expectedTraceCount) {
+        logger.info("getTraceList called with operationname {} start {} finish {} expected {}", operationName, testStartTime, testEndTime, expectedTraceCount);
         List<Trace> traces = null;
         for (long waitTime = 30 * 1000L; waitTime > 0;) {
             traces = jaegerQuery().listTrace(operationName, testStartTime, testEndTime);
+            logger.info("Query returned {} traces", traces.size());
             if (traces.size() >= expectedTraceCount) {
                 return traces;
             }
