@@ -173,11 +173,11 @@ public class TestBase {
         return getTraceList(operationName, testStartTime, null, traceCount);
     }
 
-    protected List<Trace> getTraceList(String operationName, Long testStartTime, Long testEndTime, int traceCount) {
+    protected List<Trace> getTraceList(String operationName, Long testStartTime, Long testEndTime, int expectedTraceCount) {
         List<Trace> traces = null;
         for (long waitTime = 30 * 1000L; waitTime > 0;) {
-            traces = jaegerQuery().listTrace(null, testStartTime, testEndTime);
-            if (traces.size() >= traceCount) {
+            traces = jaegerQuery().listTrace(operationName, testStartTime, testEndTime);
+            if (traces.size() >= expectedTraceCount) {
                 return traces;
             }
             sleep(1000L);//Sleep 1 second
