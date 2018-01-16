@@ -94,8 +94,7 @@ public class FirstJaegerTest extends TestBase {
      *
      * For @Ignore see https://github.com/Hawkular-QE/jaeger-java-test/issues/14
      */
-    @Ignore
-    @Test
+    @Test(enabled=false)
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
         long endTime = 0;
