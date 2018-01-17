@@ -16,20 +16,19 @@
  */
 package io.jaegertracing.qe.tests;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.jaegertracing.qe.TestBase;
+import io.jaegertracing.qe.rest.model.QESpan;
+import io.opentracing.Span;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import io.jaegertracing.qe.TestBase;
-
-import io.jaegertracing.qe.rest.model.Trace;
-import io.opentracing.Span;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by Kevin Earls on 04 April 2017.
@@ -53,16 +52,12 @@ public class TagAndDurationTests extends TestBase {
                 .startManual();
         span.finish();
 
-        waitForFlush();
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        assertEquals(1, traces.size(), "Expected 1 trace");
+        List<QESpan> spans = getSpansFromTrace(traces.get(0));
+        assertEquals(spans.size(), 1, "Expected 1 span");
 
-        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
-
-        assertEquals(traces.size(), 1, "Expected 1 trace");
-
-        List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
-        assertEquals(spans.size(), 1);
-
-        assertTag(spans.get(0).getTags(), "simple", true);
+        myAssertTag(spans.get(0).getTags(), "simple", true);
     }
 
     /**
@@ -80,18 +75,13 @@ public class TagAndDurationTests extends TestBase {
         long expectedMinimumDuration = 100;
         sleep(expectedMinimumDuration);
         span.finish();
-        waitForFlush();
 
-        List<Trace> traces = getTraceList(operationName, testStartTime, 1);
-
-        assertEquals(traces.size(), 1, "Expected 1 trace");
-
-        List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
-
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        assertEquals(1, traces.size(), "Expected 1 trace");
+        List<QESpan> spans = getSpansFromTrace(traces.get(0));
         assertEquals(spans.size(), 1, "Expected 1 span");
 
-        long expectedDuration = expectedMinimumDuration * 1000L;
-
+        long expectedDuration = expectedMinimumDuration * 1000L;  // Remember duration is in microseconds
         assertTrue(spans.get(0).getDuration() >= expectedDuration, "Expected duration: " + expectedDuration);
     }
 }

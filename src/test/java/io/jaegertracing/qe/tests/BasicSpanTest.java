@@ -1,18 +1,23 @@
 package io.jaegertracing.qe.tests;
 
-import java.util.List;
-
-import org.testng.Assert;
+import com.fasterxml.jackson.databind.JsonNode;
+import io.jaegertracing.qe.TestBase;
+import io.jaegertracing.qe.rest.model.QESpan;
+import io.opentracing.Span;
+import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import io.jaegertracing.qe.TestBase;
-import io.jaegertracing.qe.rest.model.Trace;
-import io.opentracing.Span;
+import java.util.List;
+import java.util.Map;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 1.0.0
  */
+@Slf4j
 public class BasicSpanTest extends TestBase {
 
     /*
@@ -23,20 +28,23 @@ public class BasicSpanTest extends TestBase {
     public void singleSpanTest() {
         Span span = tracer().buildSpan("simple-span").startManual();
         span.setTag("testType", "singleSpanTest");
-        long randomLong = nextLong(100000L);
-        span.setTag("randomLong", randomLong);
+        //long randomLong = nextLong(100000L) + Integer.MAX_VALUE;
+        int random = RANDOM.nextInt(100000);
+        span.setTag("random", random);
         span.finish();
         waitForFlush();
 
         // Validation
-        List<Trace> traces = getTraceList(null, testStartTime, 1);
-        Assert.assertEquals(traces.size(), 1);
-        List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery()
-                .listSpan(traces);
-        Assert.assertEquals(spans.size(), 1);
-        Assert.assertEquals(spans.get(0).getOperationName(), "simple-span");
-        assertTag(spans.get(0).getTags(), "testType", "singleSpanTest");
-        assertTag(spans.get(0).getTags(), "randomLong", randomLong);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        assertEquals(1, traces.size(), "Expected 1 trace");
+
+        List<QESpan> spans = getSpansFromTrace(traces.get(0));
+        assertEquals(1, spans.size(), "Expected 1 span");
+        QESpan receivedSpan = spans.get(0);
+        assertEquals(receivedSpan.getOperation(), "simple-span");
+        Map<String, Object> tags = receivedSpan.getTags();
+        myAssertTag(tags, "testType", "singleSpanTest");
+        myAssertTag(tags, "random", random);
     }
 
     /*
@@ -45,7 +53,7 @@ public class BasicSpanTest extends TestBase {
      */
     @Test
     public void spanWithChildTest() {
-        long randomSleep = nextLong(1000 * 2L);
+        long randomSleep = RANDOM.nextInt(1000 * 2);
         Span parentSpan = tracer().buildSpan("parent-span").startManual();
         parentSpan.setTag("sentFrom", "automation code");
         Span childSpan = tracer().buildSpan("child-span").asChildOf(parentSpan)
@@ -56,16 +64,18 @@ public class BasicSpanTest extends TestBase {
         parentSpan.finish();
         waitForFlush();
 
-        // Validation
-        List<Trace> traces = getTraceList(null, testStartTime, 1);
-        Assert.assertEquals(traces.size(), 1);
-        List<io.jaegertracing.qe.rest.model.Span> spans = jaegerQuery().listSpan(traces);
-        Assert.assertEquals(spans.size(), 2);
-        io.jaegertracing.qe.rest.model.Span span1 = getSpan(spans,
-                "parent-span");
-        Assert.assertNotNull(span1);
-        assertTag(span1.getTags(), "sentFrom", "automation code");
-        io.jaegertracing.qe.rest.model.Span span2 = getSpan(spans, "child-span");
-        Assert.assertNotNull(span2);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        assertEquals(1, traces.size(), "Expected 1 trace");
+
+        List<QESpan> spans = getSpansFromTrace(traces.get(0));
+        assertEquals(2, spans.size(), "Expected 2 spans");
+
+        QESpan receivedParentSpan = getSpanByOperationName(spans, "parent-span");
+        assertNotNull(receivedParentSpan);
+        logger.debug(simpleRestClient.prettyPrintJson(receivedParentSpan.getJson()));
+        myAssertTag(receivedParentSpan.getTags(), "sentFrom", "automation code");
+
+        QESpan receivedChildSpan = getSpanByOperationName(spans, "child-span");
+        assertNotNull(receivedChildSpan);
     }
 }

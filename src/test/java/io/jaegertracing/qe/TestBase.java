@@ -1,5 +1,6 @@
 package io.jaegertracing.qe;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.uber.jaeger.metrics.Metrics;
 import com.uber.jaeger.metrics.NullStatsReporter;
 import com.uber.jaeger.metrics.StatsFactoryImpl;
@@ -10,23 +11,16 @@ import com.uber.jaeger.samplers.Sampler;
 import com.uber.jaeger.senders.HttpSender;
 import com.uber.jaeger.senders.Sender;
 import com.uber.jaeger.senders.UdpSender;
-import io.jaegertracing.qe.queryserver.IJaegerQuery;
-import io.jaegertracing.qe.queryserver.JaegerQueryImpl;
-import io.jaegertracing.qe.rest.JaegerRestClient;
-import io.jaegertracing.qe.rest.model.Criteria;
-import io.jaegertracing.qe.rest.model.Span;
-import io.jaegertracing.qe.rest.model.Tag;
-import io.jaegertracing.qe.rest.model.Trace;
+import io.jaegertracing.qe.rest.clients.SimpleRestClient;
+import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Tracer;
 import lombok.extern.slf4j.Slf4j;
-import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -34,17 +28,10 @@ import java.util.Random;
  */
 @Slf4j
 public class TestBase {
+    public SimpleRestClient simpleRestClient = new SimpleRestClient();
     protected Long testStartTime = null;
     private static Tracer tracer = null;
-    private static JaegerRestClient restClient = null;
-    private static IJaegerQuery jaegerQuery = null;
-    static final Random RANDOM = new Random();
-    public static Long nextLong(long start, long end) {
-        return start + ((long) (RANDOM.nextDouble() * (end - start)));
-    }
-    public static Long nextLong(long end) {
-        return nextLong(0L, end);
-    }
+    public static final Random RANDOM = new Random();
 
     private static Map<String, String> envs = System.getenv();
     private static final Integer JAEGER_AGENT_COMPACT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_COMPACT_PORT", "6831"));
@@ -63,25 +50,16 @@ public class TestBase {
         testStartTime = System.currentTimeMillis() - 1L;
     }
 
-    public JaegerRestClient restClient() {
-        if (restClient == null) {
-            try {
-                restClient = JaegerRestClient
-                        .builder()
-                        .uri("http://" + JAEGER_QUERY_HOST + ":" + JAEGER_PORT_QUERY_HTTP)
-                        .build();
-            } catch (URISyntaxException ex) {
-                logger.error("Exception,", ex);
-            }
-        }
-        return restClient;
-    }
-
-    public IJaegerQuery jaegerQuery() {
-        if (jaegerQuery == null) {
-            jaegerQuery = new JaegerQueryImpl(restClient(), SERVICE_NAME);
-        }
-        return jaegerQuery;
+    /**
+     *
+     * @param tags Map of tags from a span
+     * @param key name of the tag we want to check
+     * @param expectedValue expected value of that tag
+     */
+    public void myAssertTag(Map<String, Object> tags, String key, Object expectedValue) {
+        assertTrue(tags.containsKey(key), "Could not find key: " + key);
+        Object actualValue = tags.get(key);
+        assertEquals(expectedValue, actualValue, "Wrong value for key " + key + " expected " + expectedValue.toString());
     }
 
     public Tracer tracer() {
@@ -118,73 +96,85 @@ public class TestBase {
         }
     }
 
-    public Criteria getCriteria(String service, Long start) {
-        return Criteria.builder().service(service).start(start * 1000L).build();
-    }
 
-    public void assertTag(List<Tag> tags, String key, Object value) {
-        boolean tagFound = false;
-        for (Tag tag : tags) {
-            Object received = tag.getValue();
-            if (tag.getKey().equals(key)) {
-                if (value instanceof Number) {
-                    if (((Number) value).doubleValue() == (((Number) received).doubleValue())) {
-                        tagFound = true;
-                    }
-                } else if (value instanceof Boolean) {
-                    if (((Boolean) value).booleanValue() == (((Boolean) received).booleanValue())) {
-                        tagFound = true;
-                    }
-                } else if (((String) value).equals(received)) {
-                    tagFound = true;
-                }
-            }
-            if (tagFound) {
-                break;
-            }
-        }
-        Assert.assertTrue(tagFound);
-    }
-
-    public Tag getTag(List<Tag> tags, String key) {
-        for (Tag tag : tags) {
-            if (tag.getKey().equals(key)) {
-                return tag;
+    /**
+     *
+     * @param spans
+     * @param targetOperationName
+     * @return
+     */
+    public QESpan getSpanByOperationName(List<QESpan> spans, String targetOperationName) {
+        for (QESpan s : spans) {
+            if (s.getOperation().equals(targetOperationName)) {
+                return s;
             }
         }
         return null;
     }
 
-    public Span getSpan(List<Span> spans, String name) {
-        for (Span span : spans) {
-            if (span.getOperationName().equals(name)) {
-                return span;
+
+    /**
+     * Convert all JSON Spans in the trace returned by the Jaeeger Rest API to QESpans
+     **
+     * @param trace
+     * @return
+     */
+    public List<QESpan> getSpansFromTrace(JsonNode trace) {
+        List<QESpan> spans = new ArrayList<>();
+        Iterator<JsonNode> spanIterator = trace.get("spans").iterator();
+
+        while (spanIterator.hasNext()) {
+            JsonNode jsonSpan = spanIterator.next();
+            QESpan span = createSpanFromJsonNode(jsonSpan);
+            spans.add(span);
+        }
+        return spans;
+    }
+
+    /**
+     * Convert a Span in JSON returned from the Jaeger REST API to a QESpan
+     * @param jsonSpan
+     * @return
+     */
+    public QESpan createSpanFromJsonNode(JsonNode jsonSpan) {
+        Map<String, Object> tags = new HashMap<>();
+
+        JsonNode jsonTags = jsonSpan.get("tags");
+        Iterator<JsonNode> jsonTagsIterator = jsonTags.iterator();
+        while (jsonTagsIterator.hasNext()) {
+            JsonNode jsonTag = jsonTagsIterator.next();
+            String key = jsonTag.get("key").asText();
+            String tagType = jsonTag.get("type").asText();
+            switch (tagType) {
+                case "bool" :
+                    boolean b = jsonTag.get("value").asBoolean();
+                    tags.put(key, b);
+                    break;
+                case "float64":
+                    Number n = jsonTag.get("value").asDouble();
+                    tags.put(key, n);
+                    break;
+                case "int64":
+                    Integer i = jsonTag.get("value").asInt();
+                    tags.put(key, i);
+                    break;
+                case "string" :
+                    String s = jsonTag.get("value").asText();
+                    tags.put(key, s);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown tag type [" + tagType + "[");
+
             }
         }
-        return null;
-    }
 
-    @AfterSuite
-    protected void afterClass() {
-        waitForFlush();
-    }
+        Long start = jsonSpan.get("startTime").asLong();
+        Long duration = jsonSpan.get("duration").asLong();
+        Long end = start + duration;
+        String operation = jsonSpan.get("operationName").textValue();
+        String id = jsonSpan.get("spanID").textValue();
 
-    protected List<Trace> getTraceList(String operationName, Long testStartTime, int traceCount) {
-        return getTraceList(operationName, testStartTime, null, traceCount);
-    }
-
-    protected List<Trace> getTraceList(String operationName, Long testStartTime, Long testEndTime, int expectedTraceCount) {
-        logger.info("getTraceList called with operationname {} start {} finish {} expected {}", operationName, testStartTime, testEndTime, expectedTraceCount);
-        List<Trace> traces = null;
-        for (long waitTime = 30 * 1000L; waitTime > 0;) {
-            traces = jaegerQuery().listTrace(operationName, testStartTime, testEndTime);
-            logger.info("Query returned {} traces", traces.size());
-            if (traces.size() >= expectedTraceCount) {
-                return traces;
-            }
-            sleep(1000L);//Sleep 1 second
-            waitTime -= 1000L;
-        }
-        return traces;
+        QESpan qeSpan = new QESpan(tags, start, end, duration, operation, id, null, null, jsonSpan);
+        return qeSpan;
     }
 }
