@@ -49,7 +49,7 @@ public class TagAndDurationTests extends TestBase {
         String operationName = "simpleTagTest-" + operationId.getAndIncrement();
         Span span = tracer().buildSpan(operationName)
                 .withTag("simple", true)
-                .startManual();
+                .start();
         span.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
@@ -71,7 +71,7 @@ public class TagAndDurationTests extends TestBase {
         String operationName = "simpleDurationTest-" + operationId.getAndIncrement();
         Span span = tracer().buildSpan(operationName)
                 .withTag("simple", true)
-                .startManual();
+                .start();
         long expectedMinimumDuration = 100;
         sleep(expectedMinimumDuration);
         span.finish();

@@ -39,7 +39,7 @@ public class FirstJaegerTest extends TestBase {
         String operationName = "writeASingleSpanTest" + operationId.getAndIncrement();
         Span span = tracer().buildSpan(operationName)
                 .withTag("simple", true)
-                .startManual();
+                .start();
         span.finish();
         waitForFlush();
 
@@ -66,18 +66,18 @@ public class FirstJaegerTest extends TestBase {
         String operationName = "spanWithChildrenTest" + operationId.getAndIncrement();
         Span parentSpan = tracer().buildSpan(operationName)
                 .withTag("simple", true)
-                .startManual();
+                .start();
 
         Span childSpan1 = tracer().buildSpan(operationName + "-child1")
                 .asChildOf(parentSpan)
                 .withTag("child", 1)
-                .startManual();
+                .start();
         sleep(100);
 
         Span childSpan2 = tracer().buildSpan(operationName + "-child2")
                 .asChildOf(parentSpan)
                 .withTag("child", 2)
-                .startManual();
+                .start();
         sleep(50);
 
         childSpan1.finish();
@@ -110,7 +110,7 @@ public class FirstJaegerTest extends TestBase {
             }
             Span testSpan = tracer().buildSpan(operationName)
                     .withTag("startEndTestSpan", i)
-                    .startManual();
+                    .start();
             testSpan.finish();
         }
 
@@ -129,14 +129,14 @@ public class FirstJaegerTest extends TestBase {
         String operationName = "successiveSpansTest" + operationId.getAndIncrement();
         Span firstSpan = tracer().buildSpan(operationName)
                 .withTag("firstSpan", true)
-                .startManual();
+                .start();
         sleep(50);
         firstSpan.finish();
 
         operationName = "successiveSpansTest" + operationId.getAndIncrement();
         Span secondSpan = tracer().buildSpan(operationName)
                 .withTag("secondSpan", true)
-                .startManual();
+                .start();
         sleep(75);
         secondSpan.finish();
 
@@ -151,7 +151,7 @@ public class FirstJaegerTest extends TestBase {
     @Test
     public void spanDotLogIsBrokenTest() {
         String operationName = "spanDotLogIsBrokenTest";
-        Span span = tracer().buildSpan(operationName).startManual();
+        Span span = tracer().buildSpan(operationName).start();
         Map<String, String> logFields = new HashMap<>();
         logFields.put("something", "happened");
         logFields.put("event", "occured");
@@ -181,7 +181,7 @@ public class FirstJaegerTest extends TestBase {
                 .withTag("numberTag", 42)
                 .withTag("floatTag", Math.PI)
                 .withTag("stringTag", "I am a tag")
-                .startManual();
+                .start();
         span.finish();
         waitForFlush();
 

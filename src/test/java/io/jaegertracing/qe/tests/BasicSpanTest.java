@@ -26,7 +26,7 @@ public class BasicSpanTest extends TestBase {
      */
     @Test
     public void singleSpanTest() {
-        Span span = tracer().buildSpan("simple-span").startManual();
+        Span span = tracer().buildSpan("simple-span").start();
         span.setTag("testType", "singleSpanTest");
         //long randomLong = nextLong(100000L) + Integer.MAX_VALUE;
         int random = RANDOM.nextInt(100000);
@@ -54,10 +54,11 @@ public class BasicSpanTest extends TestBase {
     @Test
     public void spanWithChildTest() {
         long randomSleep = RANDOM.nextInt(1000 * 2);
-        Span parentSpan = tracer().buildSpan("parent-span").startManual();
+        Span parentSpan = tracer().buildSpan("parent-span").start();
         parentSpan.setTag("sentFrom", "automation code");
-        Span childSpan = tracer().buildSpan("child-span").asChildOf(parentSpan)
-                .startManual();
+        Span childSpan = tracer().buildSpan("child-span")
+                .asChildOf(parentSpan)
+                .start();
         sleep(randomSleep);
         childSpan.finish();
         sleep(50L);
