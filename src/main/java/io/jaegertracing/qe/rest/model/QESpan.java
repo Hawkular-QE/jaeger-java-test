@@ -36,21 +36,6 @@ public class QESpan implements Span {
     }
 
 
-    @Deprecated
-    @Override
-    public Span log(String event, Object payload) {
-        spanObj.log(event, payload);
-        return this;
-    }
-
-
-    @Deprecated
-    @Override
-    public Span log(long timestampMicroseconds, String event, Object payload) {
-        spanObj.log(timestampMicroseconds, event, payload);
-        return this;
-    }
-
     public Span setTag(String name, String value) {
         this.tags.put(name, value);
         if (spanObj != null) {
