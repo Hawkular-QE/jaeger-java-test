@@ -15,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 public class MyListener implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
-        //logger.debug("Test: completed.. >> [{}]", context.getName());
+        logger.debug("Test: completed.. >> [{}]", context.getName());
     }
 
     @Override
     public void onStart(ITestContext context) {
-        //logger.debug("Test: starting.. >> [{}]", context.getName());
+        logger.debug("Test: starting.. >> [{}]", context.getName());
     }
 
     @Override
