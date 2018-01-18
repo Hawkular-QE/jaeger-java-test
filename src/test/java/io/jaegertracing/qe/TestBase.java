@@ -173,17 +173,17 @@ public class TestBase {
                     break;
                 default:
                     throw new RuntimeException("Unknown tag type [" + tagType + "[");
-
             }
         }
 
         Long start = jsonSpan.get("startTime").asLong();
         Long duration = jsonSpan.get("duration").asLong();
-        Long end = start + duration;
         String operation = jsonSpan.get("operationName").textValue();
         String id = jsonSpan.get("spanID").textValue();
 
-        QESpan qeSpan = new QESpan(tags, start, end, duration, operation, id, null, null, jsonSpan);
+        QESpan qeSpan = new QESpan.Builder(tags, start, duration, operation, id)
+                .json(jsonSpan)
+                .build();
         return qeSpan;
     }
 }

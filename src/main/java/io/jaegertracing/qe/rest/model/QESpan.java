@@ -14,107 +14,137 @@ import java.util.Map;
 public class QESpan implements Span {
     private Map<String, Object> tags = new HashMap<String, Object>();
     private Long start;
-    private Long end;
     private Long duration;
     private String operation;
     private String id;
     private QESpan parent;
-    private Span spanObj;
+    private Span span;
     private JsonNode json;
 
-    public QESpan(Map<String, Object> tags, Long start, Long end, Long duration, String operation, String id, QESpan parent, Span spanObj, JsonNode json) {
-        this.tags = tags;
-        this.start = start;
-        this.end = end;
-        this.duration = duration;
-        this.operation = operation;
-        this.id = id;
-        this.parent = parent;
-        this.spanObj = spanObj;
-        this.json = json;
+    private QESpan(Builder builder) {
+        this.tags = builder.tags;
+        this.start = builder.start;
+        this.duration = builder.duration;
+        this.operation = builder.operation;
+        this.id = builder.id;
+        this.parent = builder.parent;
+        this.span = builder.span;
+        this.json = builder.json;
+    }
+
+    public static class Builder {
+        // Required parameters
+        private Map<String, Object> tags = new HashMap<String, Object>();
+        private Long start;
+        private Long duration;
+        private String operation;
+        private String id;
+
+        // Optional
+        private Span span;
+        private QESpan parent;
+        private JsonNode json;
+
+        public Builder(Map<String, Object> tags, Long start, Long duration, String operation, String id) {
+            this.tags = tags;
+            this.start = start;
+            this.duration = duration;
+            this.operation = operation;
+            this.id = id;
+        }
+
+        public Builder parent(QESpan parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder span(Span span) {
+            this.span = span;
+            return this;
+        }
+
+        public Builder json(JsonNode json) {
+            this.json = json;
+            return this;
+        }
+
+        public QESpan build() {
+            return new QESpan(this);
+        }
+
+
     }
 
     public Span setOperationName(String operation) {
         this.operation = operation;
-        if (spanObj != null) {
-            spanObj.setOperationName(operation);
-        }
         return this;
     }
 
 
     public Span setTag(String name, String value) {
         this.tags.put(name, value);
-        if (spanObj != null) {
-            spanObj.setTag(name, value);
-        }
         return this;
     }
 
     public Span setTag(String name, boolean value) {
         this.tags.put(name, value);
-        if (spanObj != null) {
-            spanObj.setTag(name, value);
-        }
         return this;
     }
 
     public Span setTag(String name, Number value) {
         this.tags.put(name, value);
-        if (spanObj != null) {
-            spanObj.setTag(name, value);
-        }
         return this;
     }
 
 
     @Override
     public Span log(Map<String, ?> fields) {
-        spanObj.log(fields);
+        span.log(fields);
         return this;
     }
 
 
     @Override
     public Span log(long timestampMicroseconds, Map<String, ?> fields) {
-        spanObj.log(timestampMicroseconds, fields);
+        span.log(timestampMicroseconds, fields);
         return this;
     }
 
 
     @Override
     public Span log(String event) {
-        spanObj.log(event);
+        span.log(event);
         return this;
     }
 
 
     @Override
     public Span log(long timestampMicroseconds, String event) {
-        spanObj.log(timestampMicroseconds, event);
+        span.log(timestampMicroseconds, event);
         return this;
     }
 
 
     @Override
     public Span setBaggageItem(String key, String value) {
-        spanObj.setBaggageItem(key, value);
+        span.setBaggageItem(key, value);
         return this;
     }
 
 
     @Override
     public String getBaggageItem(String key) {
-        return spanObj.getBaggageItem(key);
+        return span.getBaggageItem(key);
     }
 
+    @Override
     public void finish(long end) {
-        this.end = end;
-        if (spanObj != null) {
-            spanObj.finish(end);
+        if (span != null) {
+            span.finish(end);
         }
     }
 
+    @Override
     public void finish() {
         finish(System.currentTimeMillis() * 1000L);
     }
@@ -122,21 +152,10 @@ public class QESpan implements Span {
 
     @Override
     public SpanContext context() {
-        return spanObj.context();
-    }
-
-
-    public Long getEnd() {
-        if (end == null && duration != null) {
-            return start + duration;
-        }
-        return end;
+        return span.context();
     }
 
     public Long getDuration() {
-        if (start != null && end != null) {
-            return end - start;
-        }
         return duration;
     }
 
@@ -164,8 +183,8 @@ public class QESpan implements Span {
         return parent;
     }
 
-    public Span getSpanObj() {
-        return spanObj;
+    public Span getspan() {
+        return span;
     }
 
     @Override
@@ -217,12 +236,11 @@ public class QESpan implements Span {
         return "QESpan{" +
                 "tags=" + tags +
                 ", start=" + start +
-                ", end=" + end +
                 ", duration=" + duration +
                 ", operation='" + operation + '\'' +
                 ", id='" + id + '\'' +
                 ", parent=" + parent +
-                ", spanObj=" + spanObj +
+                ", span=" + span +
                 ", json=" + json +
                 '}';
     }
