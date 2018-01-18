@@ -17,9 +17,9 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 public class SimpleRestClient {
     private static Map<String, String> evs = System.getenv();
     private static final Integer JAEGER_FLUSH_INTERVAL = new Integer(evs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
@@ -27,6 +27,7 @@ public class SimpleRestClient {
     private static final String JAEGER_SERVER_HOST = evs.getOrDefault("JAEGER_SERVER_HOST", "localhost");
     private static final String SERVICE_NAME = evs.getOrDefault("SERVICE_NAME", "qe");
     private ObjectMapper jsonObjectMapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(SimpleRestClient.class);
 
     /**
      * TODO: Figure out the Jaeger REST Api.  Key code can be found

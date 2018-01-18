@@ -8,17 +8,9 @@ import io.opentracing.SpanContext;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-
-
 /**
  * @author Jeeva Kandasamy (jkandasa)
  */
-@Getter
-@ToString
-@AllArgsConstructor
 public class QESpan implements Span {
     private Map<String, Object> tags = new HashMap<String, Object>();
     private Long start;
@@ -29,6 +21,18 @@ public class QESpan implements Span {
     private QESpan parent;
     private Span spanObj;
     private JsonNode json;
+
+    public QESpan(Map<String, Object> tags, Long start, Long end, Long duration, String operation, String id, QESpan parent, Span spanObj, JsonNode json) {
+        this.tags = tags;
+        this.start = start;
+        this.end = end;
+        this.duration = duration;
+        this.operation = operation;
+        this.id = id;
+        this.parent = parent;
+        this.spanObj = spanObj;
+        this.json = json;
+    }
 
     public Span setOperationName(String operation) {
         this.operation = operation;
@@ -140,6 +144,30 @@ public class QESpan implements Span {
         return json;
     }
 
+    public Map<String, Object> getTags() {
+        return tags;
+    }
+
+    public Long getStart() {
+        return start;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public QESpan getParent() {
+        return parent;
+    }
+
+    public Span getSpanObj() {
+        return spanObj;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || !QESpan.class.isAssignableFrom(obj.getClass())) {
@@ -176,10 +204,26 @@ public class QESpan implements Span {
         return true;
     }
 
+
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + operation.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "QESpan{" +
+                "tags=" + tags +
+                ", start=" + start +
+                ", end=" + end +
+                ", duration=" + duration +
+                ", operation='" + operation + '\'' +
+                ", id='" + id + '\'' +
+                ", parent=" + parent +
+                ", spanObj=" + spanObj +
+                ", json=" + json +
+                '}';
     }
 }

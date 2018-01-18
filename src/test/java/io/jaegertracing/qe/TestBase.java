@@ -26,15 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 1.0.0
  */
-@Slf4j
 public class TestBase {
     public SimpleRestClient simpleRestClient = new SimpleRestClient();
     protected Long testStartTime = null;
@@ -52,6 +51,8 @@ public class TestBase {
     private static final String JAEGER_PORT_ZIPKIN_COLLECTOR = envs.getOrDefault("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268");
     private static final String SERVICE_NAME  = envs.getOrDefault("SERVICE_NAME", "qe");
     private static final String USE_COLLECTOR_OR_AGENT = envs.getOrDefault("USE_COLLECTOR_OR_AGENT", "collector");
+
+    private static final Logger logger = LoggerFactory.getLogger(TestBase.class);
 
     @BeforeMethod
     public void updateTestStartTime() {

@@ -1,7 +1,7 @@
 package io.jaegertracing.qe;
 
-import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -10,9 +10,9 @@ import org.testng.ITestResult;
  * @author Jeeva Kandasamy (jkandasa)
  * @since 1.0.0
  */
-
-@Slf4j
 public class MyListener implements ITestListener {
+    private static final Logger logger = LoggerFactory.getLogger(MyListener.class);
+
     @Override
     public void onFinish(ITestContext context) {
         logger.debug("Test: completed.. >> [{}]", context.getName());

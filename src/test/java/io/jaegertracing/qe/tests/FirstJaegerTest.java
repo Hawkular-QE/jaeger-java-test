@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -24,9 +24,9 @@ import org.testng.annotations.Test;
  * Created by Kevin Earls on 14/04/2017.
  *
  */
-@Slf4j
 public class FirstJaegerTest extends TestBase {
     AtomicInteger operationId = new AtomicInteger(0);
+    private static final Logger logger = LoggerFactory.getLogger(FirstJaegerTest.class);
 
     @BeforeMethod
     public void beforeMethod() {
