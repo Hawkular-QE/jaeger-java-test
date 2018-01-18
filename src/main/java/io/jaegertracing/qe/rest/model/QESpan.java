@@ -1,14 +1,17 @@
 package io.jaegertracing.qe.rest.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -108,15 +111,16 @@ public class QESpan implements Span {
         }
     }
 
+    public void finish() {
+        finish(System.currentTimeMillis() * 1000L);
+    }
+
 
     @Override
     public SpanContext context() {
         return spanObj.context();
     }
 
-    public void finish() {
-        finish(System.currentTimeMillis() * 1000L);
-    }
 
     public Long getEnd() {
         if (end == null && duration != null) {

@@ -1,17 +1,20 @@
 package io.jaegertracing.qe.tests;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.jaegertracing.qe.TestBase;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Span;
-import lombok.extern.slf4j.Slf4j;
-import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import lombok.extern.slf4j.Slf4j;
+
+import org.testng.annotations.Test;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)

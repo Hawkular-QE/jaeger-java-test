@@ -16,19 +16,21 @@
  */
 package io.jaegertracing.qe.tests;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.jaegertracing.qe.TestBase;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Span;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Created by Kevin Earls on 04 April 2017.
@@ -64,10 +66,9 @@ public class TagAndDurationTests extends TestBase {
      * Write a single span with a sleep before the finish, and make sure the
      * duration is correct.
      *
-     * @throws InterruptedException
      */
     @Test
-    public void simpleDurationTest() throws Exception {
+    public void simpleDurationTest()  {
         String operationName = "simpleDurationTest-" + operationId.getAndIncrement();
         Span span = tracer().buildSpan(operationName)
                 .withTag("simple", true)

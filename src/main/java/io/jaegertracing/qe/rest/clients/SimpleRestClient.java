@@ -4,18 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SimpleRestClient {
@@ -41,7 +43,6 @@ public class SimpleRestClient {
      *
      * FIXME - add retry ability?
      *
-     * @throws Exception
      */
     public List<JsonNode> getTraces(String parameters) {
         waitForFlush(); // TODO make sure this is necessary
@@ -51,7 +52,6 @@ public class SimpleRestClient {
         if (parameters != null && !parameters.trim().isEmpty()) {
             targetUrl = targetUrl + "&" + parameters;
         }
-        //logger.debug("using targetURL [{}]", targetUrl);
 
         try  {
             WebTarget target = client.target(targetUrl);
@@ -88,7 +88,6 @@ public class SimpleRestClient {
      *
      * @param testStartTime in milliseconds
      * @return A List of Traces created after the time specified.
-     * @throws Exception
      */
     public List<JsonNode> getTracesSinceTestStart(long testStartTime) {
         List<JsonNode> traces = getTraces("start=" + (testStartTime * 1000));
@@ -103,7 +102,6 @@ public class SimpleRestClient {
      * @param start start time in milliseconds
      * @param end end time in milliseconds
      * @return A List of traces created between the times specified.
-     * @throws Exception
      */
     public List<JsonNode> getTracesBetween(long start, long end) {
         String parameters = "start=" + (start * 1000) + "&end=" + (end * 1000);
@@ -118,17 +116,17 @@ public class SimpleRestClient {
      */
     public void waitForFlush() {
         try {
-            Thread.sleep(JAEGER_FLUSH_INTERVAL);   // TODO is this adequate?
+            Thread.sleep(JAEGER_FLUSH_INTERVAL);
         } catch (InterruptedException e) {
+            logger.warn("Sleep interrupted", e);
         }
     }
 
 
     /**
      * Return a formatted JSON String
-     * @param json
-     * @return
-     * @throws JsonProcessingException
+     * @param json Some json that you want to format
+     * @return pretty formatted json
      */
     public String prettyPrintJson(JsonNode json) {
         String pretty = "";
@@ -146,9 +144,8 @@ public class SimpleRestClient {
      * Debugging method
      *
      * @param traces A list of traces to print
-     * @throws Exception
      */
-    protected void dumpAllTraces(List<JsonNode> traces) throws Exception {
+    protected void dumpAllTraces(List<JsonNode> traces)  {
         logger.info("Got " + traces.size() + " traces");
 
         for (JsonNode trace : traces) {

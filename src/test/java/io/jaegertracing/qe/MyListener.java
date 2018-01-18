@@ -1,10 +1,10 @@
 package io.jaegertracing.qe;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)

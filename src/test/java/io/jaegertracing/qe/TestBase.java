@@ -1,5 +1,8 @@
 package io.jaegertracing.qe;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.uber.jaeger.metrics.Metrics;
 import com.uber.jaeger.metrics.NullStatsReporter;
@@ -11,16 +14,21 @@ import com.uber.jaeger.samplers.Sampler;
 import com.uber.jaeger.senders.HttpSender;
 import com.uber.jaeger.senders.Sender;
 import com.uber.jaeger.senders.UdpSender;
+
 import io.jaegertracing.qe.rest.clients.SimpleRestClient;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Tracer;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.testng.annotations.BeforeMethod;
-
-import java.util.*;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -99,9 +107,9 @@ public class TestBase {
 
     /**
      *
-     * @param spans
-     * @param targetOperationName
-     * @return
+     * @param spans List of spans from a given trace
+     * @param targetOperationName the operation name of the span we're looking for
+     * @return A Span with the specified operation name
      */
     public QESpan getSpanByOperationName(List<QESpan> spans, String targetOperationName) {
         for (QESpan s : spans) {
@@ -116,8 +124,8 @@ public class TestBase {
     /**
      * Convert all JSON Spans in the trace returned by the Jaeeger Rest API to QESpans
      **
-     * @param trace
-     * @return
+     * @param trace A single trace
+     * @return A list of all spans contained in this trace
      */
     public List<QESpan> getSpansFromTrace(JsonNode trace) {
         List<QESpan> spans = new ArrayList<>();
@@ -133,8 +141,8 @@ public class TestBase {
 
     /**
      * Convert a Span in JSON returned from the Jaeger REST API to a QESpan
-     * @param jsonSpan
-     * @return
+     * @param jsonSpan JSON representation of a span from a trace
+     * @return A QESpan build from the given json
      */
     public QESpan createSpanFromJsonNode(JsonNode jsonSpan) {
         Map<String, Object> tags = new HashMap<>();

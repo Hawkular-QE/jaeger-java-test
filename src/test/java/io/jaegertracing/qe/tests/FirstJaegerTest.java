@@ -1,21 +1,24 @@
 package io.jaegertracing.qe.tests;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import io.jaegertracing.qe.TestBase;
-import io.jaegertracing.qe.rest.clients.SimpleRestClient;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Span;
-import lombok.extern.slf4j.Slf4j;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import lombok.extern.slf4j.Slf4j;
+
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 
 /**
  * Created by Kevin Earls on 14/04/2017.
@@ -98,7 +101,7 @@ public class FirstJaegerTest extends TestBase {
      *
      * For @Ignore see https://github.com/Hawkular-QE/jaeger-java-test/issues/14
      */
-    @Test(enabled=false)
+    @Test(enabled = false)
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
         long testEndTime = 0;
