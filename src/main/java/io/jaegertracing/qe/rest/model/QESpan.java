@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,7 +147,7 @@ public class QESpan implements Span {
 
     @Override
     public void finish() {
-        finish(System.currentTimeMillis() * 1000L);
+        finish(Instant.now().toEpochMilli() * 1000L);
     }
 
 

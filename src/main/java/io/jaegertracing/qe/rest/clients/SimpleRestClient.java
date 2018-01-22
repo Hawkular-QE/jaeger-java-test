@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -85,27 +86,26 @@ public class SimpleRestClient {
 
     /**
      * Return all of the traces created since the start time given.  NOTE: The Jaeger Rest API
-     * requires a time in microseconds.  For convenience this method accepts milliseconds and converts.
+     * requires a time in microseconds.
      *
-     * @param testStartTime in milliseconds
+     * @param testStartTime time the test started
      * @return A List of Traces created after the time specified.
      */
-    public List<JsonNode> getTracesSinceTestStart(long testStartTime) {
-        List<JsonNode> traces = getTraces("start=" + (testStartTime * 1000));
+    public List<JsonNode> getTracesSinceTestStart(Instant testStartTime) {
+        List<JsonNode> traces = getTraces("start=" + (testStartTime.toEpochMilli() * 1000));
         return traces;
     }
 
     /**
-     * Return all of the traces created between the start and end times given.  NOTE: Times should be in
-     * milliseconds.  The Jaeger Rest API requires times in microseconds, but for convenience this method
-     * will accept milliseconds and do the conversion
+     * Return all of the traces created between the start and end times given.  NOTE: The Jaeger Rest API requires times
+     * in microseconds.
      *
-     * @param start start time in milliseconds
-     * @param end end time in milliseconds
+     * @param start start time
+     * @param end end time
      * @return A List of traces created between the times specified.
      */
-    public List<JsonNode> getTracesBetween(long start, long end) {
-        String parameters = "start=" + (start * 1000) + "&end=" + (end * 1000);
+    public List<JsonNode> getTracesBetween(Instant start, Instant end) {
+        String parameters = "start=" + (start.toEpochMilli() * 1000) + "&end=" + (end.toEpochMilli() * 1000);
         List<JsonNode> traces = getTraces(parameters);
         return traces;
 

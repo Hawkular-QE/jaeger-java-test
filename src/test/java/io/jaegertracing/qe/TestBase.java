@@ -19,6 +19,7 @@ import io.jaegertracing.qe.rest.clients.SimpleRestClient;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Tracer;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +37,7 @@ import org.testng.annotations.BeforeMethod;
  */
 public class TestBase {
     public SimpleRestClient simpleRestClient = new SimpleRestClient();
-    protected Long testStartTime = null;
+    protected Instant testStartTime = null;
     private static Tracer tracer = null;
     public static final Random RANDOM = new Random();
 
@@ -56,7 +57,7 @@ public class TestBase {
 
     @BeforeMethod
     public void updateTestStartTime() {
-        testStartTime = System.currentTimeMillis() - 1L;
+        testStartTime = Instant.now();
     }
 
     /**

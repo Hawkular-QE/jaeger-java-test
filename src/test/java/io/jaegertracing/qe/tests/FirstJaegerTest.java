@@ -9,6 +9,7 @@ import io.jaegertracing.qe.TestBase;
 import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Span;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +105,11 @@ public class FirstJaegerTest extends TestBase {
     @Test(enabled = false)
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
-        long testEndTime = 0;
+        Instant testEndTime = Instant.now();
         int expectedTraceCount = 3;
         for (int i = 0; i < 5; i++) {
             if (i == expectedTraceCount) {
-                testEndTime = System.currentTimeMillis();
+                testEndTime = Instant.now();
                 sleep(50);
             }
             Span testSpan = tracer().buildSpan(operationName)
