@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -92,7 +93,8 @@ public class SimpleRestClient {
      * @return A List of Traces created after the time specified.
      */
     public List<JsonNode> getTracesSinceTestStart(Instant testStartTime) {
-        List<JsonNode> traces = getTraces("start=" + (testStartTime.toEpochMilli() * 1000));
+        long startTime = TimeUnit.MILLISECONDS.toMicros(testStartTime.toEpochMilli());
+        List<JsonNode> traces = getTraces("start=" + startTime);
         return traces;
     }
 
@@ -100,15 +102,16 @@ public class SimpleRestClient {
      * Return all of the traces created between the start and end times given.  NOTE: The Jaeger Rest API requires times
      * in microseconds.
      *
-     * @param start start time
-     * @param end end time
+     * @param testStartTime start time
+     * @param testEndTime end time
      * @return A List of traces created between the times specified.
      */
-    public List<JsonNode> getTracesBetween(Instant start, Instant end) {
-        String parameters = "start=" + (start.toEpochMilli() * 1000) + "&end=" + (end.toEpochMilli() * 1000);
+    public List<JsonNode> getTracesBetween(Instant testStartTime, Instant testEndTime) {
+        long startTime = TimeUnit.MILLISECONDS.toMicros(testStartTime.toEpochMilli());
+        long endTime = TimeUnit.MILLISECONDS.toMicros(testEndTime.toEpochMilli());
+        String parameters = "start=" + startTime + "&end=" + endTime;
         List<JsonNode> traces = getTraces(parameters);
         return traces;
-
     }
 
 

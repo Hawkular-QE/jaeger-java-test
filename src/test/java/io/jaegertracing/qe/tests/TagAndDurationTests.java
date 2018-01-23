@@ -27,6 +27,7 @@ import io.opentracing.Span;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.testng.annotations.BeforeMethod;
@@ -82,7 +83,7 @@ public class TagAndDurationTests extends TestBase {
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
         assertEquals(spans.size(), 1, "Expected 1 span");
 
-        long expectedDuration = expectedMinimumDuration * 1000L;  // Remember duration is in microseconds
+        long expectedDuration = TimeUnit.MILLISECONDS.toMicros(expectedMinimumDuration);  // Remember duration is in microseconds
         assertTrue(spans.get(0).getDuration() >= expectedDuration, "Expected duration: " + expectedDuration);
     }
 }

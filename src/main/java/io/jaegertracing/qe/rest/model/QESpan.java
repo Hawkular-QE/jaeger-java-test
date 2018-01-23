@@ -8,6 +8,7 @@ import io.opentracing.SpanContext;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -147,7 +148,7 @@ public class QESpan implements Span {
 
     @Override
     public void finish() {
-        finish(Instant.now().toEpochMilli() * 1000L);
+        finish(TimeUnit.MILLISECONDS.toMicros(Instant.now().toEpochMilli()));
     }
 
 

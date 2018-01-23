@@ -31,7 +31,6 @@ public class BasicSpanTest extends TestBase {
     public void singleSpanTest() {
         Span span = tracer().buildSpan("simple-span").start();
         span.setTag("testType", "singleSpanTest");
-        //long randomLong = nextLong(100000L) + Integer.MAX_VALUE;
         int random = RANDOM.nextInt(100000);
         span.setTag("random", random);
         span.finish();
