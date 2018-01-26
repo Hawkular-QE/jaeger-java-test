@@ -1,7 +1,7 @@
 package io.jaegertracing.qe.tests;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -15,10 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 
 /**
@@ -29,7 +30,7 @@ public class FirstJaegerTest extends TestBase {
     AtomicInteger operationId = new AtomicInteger(0);
     private static final Logger logger = LoggerFactory.getLogger(FirstJaegerTest.class);
 
-    @BeforeMethod
+    @Before
     public void beforeMethod() {
         operationId.incrementAndGet();
     }
@@ -48,10 +49,10 @@ public class FirstJaegerTest extends TestBase {
         waitForFlush();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
 
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(spans.size(), 1, "Expected 1 span");
+        assertEquals("Expected 1 span", spans.size(), 1);
         QESpan receivedSpan = spans.get(0);
         assertEquals(receivedSpan.getOperation(), operationName);
         logger.debug(simpleRestClient.prettyPrintJson(receivedSpan.getJson()));
@@ -90,7 +91,7 @@ public class FirstJaegerTest extends TestBase {
         parentSpan.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(traces.size(), 1, "Expected 1 trace");
+        assertEquals("Expected 1 trace", traces.size(), 1);
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
         assertEquals(spans.size(), 3);
 
@@ -100,9 +101,9 @@ public class FirstJaegerTest extends TestBase {
     /**
      * A simple test of the start and end options when fetching traces.
      *
-     * For @Ignore see https://github.com/Hawkular-QE/jaeger-java-test/issues/14
      */
-    @Test(enabled = false)
+    @Ignore("See https://github.com/Hawkular-QE/jaeger-java-test/issues/14")
+    @Test
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
         Instant testEndTime = Instant.now();
@@ -119,7 +120,7 @@ public class FirstJaegerTest extends TestBase {
         }
 
         List<JsonNode> traces = simpleRestClient.getTracesBetween(testStartTime, testEndTime);
-        assertEquals(traces.size(), expectedTraceCount, "Expected " + expectedTraceCount + " traces");
+        assertEquals("Expected " + expectedTraceCount + " traces", traces.size(), expectedTraceCount);
         // TODO add more assertions
     }
 
@@ -145,7 +146,7 @@ public class FirstJaegerTest extends TestBase {
         secondSpan.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(traces.size(), 2, "Expected 2 traces");
+        assertEquals("Expected 2 traces", traces.size(), 2);
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
     }
 
@@ -164,7 +165,7 @@ public class FirstJaegerTest extends TestBase {
         span.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(traces.size(), 1, "Expected 1 trace");
+        assertEquals("Expected 1 trace", traces.size(), 1);
 
         //TODO: validate log; need to update QESpan to add log fields, or get them directly from Json
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
@@ -190,9 +191,9 @@ public class FirstJaegerTest extends TestBase {
         waitForFlush();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(spans.size(), 1, "Expected 1 span");
+        assertEquals("Expected 1 span", spans.size(), 1);
         Map<String, Object> tags = spans.get(0).getTags();
 
         // TODO do we need to validate the tag type in the Json?

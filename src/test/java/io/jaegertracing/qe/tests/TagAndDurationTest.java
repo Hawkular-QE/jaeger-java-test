@@ -16,8 +16,8 @@
  */
 package io.jaegertracing.qe.tests;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -30,16 +30,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+
 
 /**
  * Created by Kevin Earls on 04 April 2017.
  */
-public class TagAndDurationTests extends TestBase {
+public class TagAndDurationTest extends TestBase {
     AtomicLong operationId = new AtomicLong(Instant.now().getEpochSecond());
 
-    @BeforeMethod
+    @Before
     public void beforeMethod() {
         operationId.incrementAndGet();
     }
@@ -56,9 +57,9 @@ public class TagAndDurationTests extends TestBase {
         span.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(spans.size(), 1, "Expected 1 span");
+        assertEquals("Expected 1 span", spans.size(), 1);
 
         myAssertTag(spans.get(0).getTags(), "simple", true);
     }
@@ -79,11 +80,11 @@ public class TagAndDurationTests extends TestBase {
         span.finish();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(spans.size(), 1, "Expected 1 span");
+        assertEquals("Expected 1 span", spans.size(), 1);
 
         long expectedDuration = TimeUnit.MILLISECONDS.toMicros(expectedMinimumDuration);  // Remember duration is in microseconds
-        assertTrue(spans.get(0).getDuration() >= expectedDuration, "Expected duration: " + expectedDuration);
+        assertTrue("Expected duration: " + expectedDuration, spans.get(0).getDuration() >= expectedDuration);
     }
 }

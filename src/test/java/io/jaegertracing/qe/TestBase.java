@@ -1,7 +1,7 @@
 package io.jaegertracing.qe;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.uber.jaeger.metrics.Metrics;
@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.BeforeMethod;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -53,7 +53,7 @@ public class TestBase {
 
     private static final Logger logger = LoggerFactory.getLogger(TestBase.class);
 
-    @BeforeMethod
+    @Before
     public void updateTestStartTime() {
         testStartTime = Instant.now();
     }
@@ -65,9 +65,9 @@ public class TestBase {
      * @param expectedValue expected value of that tag
      */
     public void myAssertTag(Map<String, Object> tags, String key, Object expectedValue) {
-        assertTrue(tags.containsKey(key), "Could not find key: " + key);
+        assertTrue("Could not find key: " + key, tags.containsKey(key));
         Object actualValue = tags.get(key);
-        assertEquals(expectedValue, actualValue, "Wrong value for key " + key + " expected " + expectedValue.toString());
+        assertEquals("Wrong value for key " + key + " expected " + expectedValue.toString(), expectedValue, actualValue);
     }
 
     public Tracer tracer() {

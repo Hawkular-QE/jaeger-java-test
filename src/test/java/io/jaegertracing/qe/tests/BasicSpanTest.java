@@ -1,7 +1,7 @@
 package io.jaegertracing.qe.tests;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -12,9 +12,11 @@ import io.opentracing.Span;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.Test;
+
+
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -38,10 +40,10 @@ public class BasicSpanTest extends TestBase {
 
         // Validation
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
 
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(1, spans.size(), "Expected 1 span");
+        assertEquals("Expected 1 span", 1, spans.size());
         QESpan receivedSpan = spans.get(0);
         assertEquals(receivedSpan.getOperation(), "simple-span");
         Map<String, Object> tags = receivedSpan.getTags();
@@ -68,10 +70,10 @@ public class BasicSpanTest extends TestBase {
         waitForFlush();
 
         List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
-        assertEquals(1, traces.size(), "Expected 1 trace");
+        assertEquals("Expected 1 trace", 1, traces.size());
 
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals(2, spans.size(), "Expected 2 spans");
+        assertEquals("Expected 2 spans", 2, spans.size());
 
         QESpan receivedParentSpan = getSpanByOperationName(spans, "parent-span");
         assertNotNull(receivedParentSpan);
