@@ -1,4 +1,4 @@
-package io.jaegertracing.qe.rest.model;
+package io.jaegertracing.qe;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

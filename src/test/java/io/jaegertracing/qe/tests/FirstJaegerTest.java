@@ -5,8 +5,8 @@ import static org.testng.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.jaegertracing.qe.QESpan;
 import io.jaegertracing.qe.TestBase;
-import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Span;
 
 import java.time.Instant;

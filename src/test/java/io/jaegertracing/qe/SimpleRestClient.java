@@ -1,4 +1,4 @@
-package io.jaegertracing.qe.rest.clients;
+package io.jaegertracing.qe;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

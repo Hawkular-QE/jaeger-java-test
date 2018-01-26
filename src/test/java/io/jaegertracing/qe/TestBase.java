@@ -15,8 +15,6 @@ import com.uber.jaeger.senders.HttpSender;
 import com.uber.jaeger.senders.Sender;
 import com.uber.jaeger.senders.UdpSender;
 
-import io.jaegertracing.qe.rest.clients.SimpleRestClient;
-import io.jaegertracing.qe.rest.model.QESpan;
 import io.opentracing.Tracer;
 
 import java.time.Instant;
