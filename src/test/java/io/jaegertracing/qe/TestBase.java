@@ -1,3 +1,16 @@
+/**
+ * Copyright 2017-2018 The Jaeger Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package io.jaegertracing.qe;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +27,6 @@ import com.uber.jaeger.samplers.Sampler;
 import com.uber.jaeger.senders.HttpSender;
 import com.uber.jaeger.senders.Sender;
 import com.uber.jaeger.senders.UdpSender;
-
 import io.opentracing.Tracer;
 
 import java.time.Instant;
@@ -26,6 +38,10 @@ import java.util.Map;
 import java.util.Random;
 
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,22 +56,28 @@ public class TestBase {
     public static final Random RANDOM = new Random();
 
     private static Map<String, String> envs = System.getenv();
-    private static final Integer JAEGER_AGENT_COMPACT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_COMPACT_PORT", "6831"));
-    private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "localhost");
-    private static final String JAEGER_COLLECTOR_HOST  = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "localhost");
+    private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "jaeger-agent");
+    private static final Integer JAEGER_AGENT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_PORT", "6831"));
+    private static final String JAEGER_COLLECTOR_HOST  = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "jaeger-collector");
+    private static final String JAEGER_COLLECTOR_PORT = envs.getOrDefault("JAEGER_COLLECTOR_PORT", "14268");
     private static Integer JAEGER_FLUSH_INTERVAL = Integer.valueOf(envs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
-    private static final String JAEGER_QUERY_HOST = envs.getOrDefault("JAEGER_QUERY_HOST", "localhost");
-    private static final String JAEGER_PORT_AGENT_ZIPKIN_THRIFT = envs.getOrDefault("JAEGER_PORT_AGENT_ZIPKIN_THRIFT", "5775");
-    private static final String JAEGER_PORT_QUERY_HTTP  = envs.getOrDefault("JAEGER_PORT_QUERY_HTTP", "16686");
-    private static final String JAEGER_PORT_ZIPKIN_COLLECTOR = envs.getOrDefault("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268");
+
     private static final String SERVICE_NAME  = envs.getOrDefault("SERVICE_NAME", "qe");
     private static final String USE_COLLECTOR_OR_AGENT = envs.getOrDefault("USE_COLLECTOR_OR_AGENT", "collector");
 
     private static final Logger logger = LoggerFactory.getLogger(TestBase.class);
 
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            logger.debug("Starting test: " + description.getMethodName());
+        }
+    };
+
     @Before
     public void updateTestStartTime() {
         testStartTime = Instant.now();
+        sleep(10);
     }
 
     /**
@@ -75,12 +97,12 @@ public class TestBase {
 
         if (tracer == null) {
             if (USE_COLLECTOR_OR_AGENT.equals("collector")) {
-                String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_PORT_ZIPKIN_COLLECTOR + "/api/traces";
+                String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_COLLECTOR_PORT + "/api/traces";
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
                 sender = new HttpSender(httpEndpoint);
             } else {
-                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_COMPACT_PORT, 1024);
-                logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_COMPACT_PORT);
+                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_PORT, 1024);
+                logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_PORT);
             }
 
             Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
@@ -97,7 +119,7 @@ public class TestBase {
 
     public void sleep(long milliseconds) {
         try {
-            logger.debug("Sleeping {} ms", milliseconds);
+            //logger.debug("Sleeping {} ms", milliseconds);
             Thread.sleep(milliseconds);
         } catch (InterruptedException ex) {
             logger.error("Exception,", ex);
