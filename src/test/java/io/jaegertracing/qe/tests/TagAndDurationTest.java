@@ -1,18 +1,15 @@
-/*
- * Copyright 2015-2017 Red Hat, Inc. and/or its affiliates
- * and other contributors as indicated by the @author tags.
+/**
+ * Copyright 2017-2018 The Jaeger Authors
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package io.jaegertracing.qe.tests;
 
@@ -20,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.jaegertracing.qe.QESpan;
 import io.jaegertracing.qe.TestBase;
 import io.opentracing.Span;
@@ -32,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Before;
 import org.junit.Test;
+
 
 
 /**
@@ -56,7 +53,7 @@ public class TagAndDurationTest extends TestBase {
                 .start();
         span.finish();
 
-        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
         assertEquals("Expected 1 trace", 1, traces.size());
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
         assertEquals("Expected 1 span", spans.size(), 1);
@@ -79,10 +76,10 @@ public class TagAndDurationTest extends TestBase {
         sleep(expectedMinimumDuration);
         span.finish();
 
-        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
         assertEquals("Expected 1 trace", 1, traces.size());
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
-        assertEquals("Expected 1 span", spans.size(), 1);
+        assertEquals("Expected 1 span", 1, spans.size());
 
         long expectedDuration = TimeUnit.MILLISECONDS.toMicros(expectedMinimumDuration);  // Remember duration is in microseconds
         assertTrue("Expected duration: " + expectedDuration, spans.get(0).getDuration() >= expectedDuration);

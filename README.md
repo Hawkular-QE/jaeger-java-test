@@ -10,23 +10,21 @@ We can run these tests on Jaeger server instance running locally or with hostnam
 
 
 ## How to run the test?
-#### Update Jaeger server details
-We can update Jaeger server details as bash environment. We can set all variables or only a few.
+#### Environment variables
+These tests use the environment variables specified below.  The defaults are for running in an OpenShift environment.  
+If you want to run the tests locally you will need to change some of these.
 
-Supported types:
-
-* `JAEGER_QUERY_HOST` - default `localhost`
-* `JAEGER_QUERY_PROTOCOL` - can be `http` or `https`. default `http`
-* `JAEGER_AGENT_HOST` - default `localhost`
-* `JAEGER_PORT_QUERY_HTTP` - default `16686`
-* `JAEGER_PORT_AGENT_ZIPKIN_THRIFT` - default `5775`
-* `JAEGER_PORT_AGENT_COMPACT` - default `6831`
-* `JAEGER_PORT_AGENT_BINARY` - default `6832`
-* `JAEGER_PORT_ZIPKIN_COLLECTOR` - default `14268`
++ `JAEGER_AGENT_HOST` - default "jaeger-agent"
++ `JAEGER_AGENT_PORT` - default 6831
++ `JAEGER_COLLECTOR_HOST` - default "jaeger-collector"
++ `JAEGER_COLLECTOR_PORT` - default 14268
++ `JAEGER_QUERY_HOST` - default "jaeger-query"
++ `JAEGER_QUERY_PORT` - default 80
++ `JAEGER_FLUSH_INTERVAL` - default 1000
 
 #### To run test
 ```bash
 git clone https://github.com/Hawkular-QE/jaeger-java-test
-cd jaeger-java-test
+cd jaeger-java-test********
 mvn test
 ```

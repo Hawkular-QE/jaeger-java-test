@@ -1,3 +1,16 @@
+/**
+ * Copyright 2017-2018 The Jaeger Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package io.jaegertracing.qe.tests;
 
 import static org.junit.Assert.assertEquals;
@@ -15,8 +28,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
@@ -39,13 +50,13 @@ public class BasicSpanTest extends TestBase {
         waitForFlush();
 
         // Validation
-        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
         assertEquals("Expected 1 trace", 1, traces.size());
 
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
         assertEquals("Expected 1 span", 1, spans.size());
         QESpan receivedSpan = spans.get(0);
-        assertEquals(receivedSpan.getOperation(), "simple-span");
+        assertEquals("simple-span", receivedSpan.getOperation());
         Map<String, Object> tags = receivedSpan.getTags();
         myAssertTag(tags, "testType", "singleSpanTest");
         myAssertTag(tags, "random", random);
@@ -69,7 +80,7 @@ public class BasicSpanTest extends TestBase {
         parentSpan.finish();
         waitForFlush();
 
-        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime);
+        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
         assertEquals("Expected 1 trace", 1, traces.size());
 
         List<QESpan> spans = getSpansFromTrace(traces.get(0));
