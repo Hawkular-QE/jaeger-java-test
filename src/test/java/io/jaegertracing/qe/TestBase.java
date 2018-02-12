@@ -59,7 +59,7 @@ public class TestBase {
     private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "jaeger-agent");
     private static final Integer JAEGER_AGENT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_PORT", "6831"));
     private static final String JAEGER_COLLECTOR_HOST  = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "jaeger-collector");
-    private static final String JAEGER_COLLECTOR_PORT = envs.getOrDefault("JAEGER_COLLECTOR_PORT", "14268");
+    private static final String JAEGER_COLLECTOR_SERVICE_PORT = envs.getOrDefault("JAEGER_COLLECTOR_SERVICE_PORT", "14268");
     private static Integer JAEGER_FLUSH_INTERVAL = Integer.valueOf(envs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
 
     private static final String SERVICE_NAME  = envs.getOrDefault("SERVICE_NAME", "qe");
@@ -97,7 +97,7 @@ public class TestBase {
 
         if (tracer == null) {
             if (USE_COLLECTOR_OR_AGENT.equals("collector")) {
-                String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_COLLECTOR_PORT + "/api/traces";
+                String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_COLLECTOR_SERVICE_PORT + "/api/traces";
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
                 sender = new HttpSender(httpEndpoint);
             } else {
