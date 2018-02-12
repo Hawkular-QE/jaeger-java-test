@@ -19,7 +19,7 @@ If you want to run the tests locally you will need to change some of these.
 + `JAEGER_COLLECTOR_HOST` - default "jaeger-collector"
 + `JAEGER_COLLECTOR_PORT` - default 14268
 + `JAEGER_QUERY_HOST` - default "jaeger-query"
-+ `JAEGER_QUERY_PORT` - default 80
++ `JAEGER_QUERY_SERVICE_PORT` - default 80
 + `JAEGER_FLUSH_INTERVAL` - default 1000
 
 #### To run test

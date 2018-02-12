@@ -39,7 +39,7 @@ public class SimpleRestClient {
     private static Map<String, String> evs = System.getenv();
     private static final Integer JAEGER_FLUSH_INTERVAL = new Integer(evs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
     private static final String JAEGER_QUERY_HOST = evs.getOrDefault("JAEGER_QUERY_HOST", "jaeger-query");
-    private static final Integer JAEGER_QUERY_PORT = new Integer(evs.getOrDefault("JAEGER_QUERY_PORT", "80"));
+    private static final Integer JAEGER_QUERY_SERVICE_PORT = new Integer(evs.getOrDefault("JAEGER_QUERY_SERVICE_PORT", "80"));
     private static final String SERVICE_NAME = evs.getOrDefault("SERVICE_NAME", "qe");
 
     // Limit for the number of retries when getting traces
@@ -60,7 +60,7 @@ public class SimpleRestClient {
     private List<JsonNode> getTraces(String parameters) {
         List<JsonNode> traces = new ArrayList<>();
         Client client = ClientBuilder.newClient();
-        String targetUrl = "http://" + JAEGER_QUERY_HOST + ":" + JAEGER_QUERY_PORT + "/api/traces?service=" + SERVICE_NAME;
+        String targetUrl = "http://" + JAEGER_QUERY_HOST + ":" + JAEGER_QUERY_SERVICE_PORT + "/api/traces?service=" + SERVICE_NAME;
         if (parameters != null && !parameters.trim().isEmpty()) {
             targetUrl = targetUrl + "&" + parameters;
         }
