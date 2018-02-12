@@ -25,6 +25,6 @@ If you want to run the tests locally you will need to change some of these.
 #### To run test
 ```bash
 git clone https://github.com/Hawkular-QE/jaeger-java-test
-cd jaeger-java-test********
+cd jaeger-java-test
 mvn test
 ```
