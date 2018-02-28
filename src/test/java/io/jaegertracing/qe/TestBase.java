@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,7 +53,7 @@ public class TestBase {
     public SimpleRestClient simpleRestClient = new SimpleRestClient();
     protected Instant testStartTime = null;
     private static Tracer tracer = null;
-    public static final Random RANDOM = new Random();
+    public static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
     private static Map<String, String> envs = System.getenv();
     private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "jaeger-agent");
