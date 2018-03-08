@@ -15,7 +15,7 @@
     <!-- Maven general -->
     <autoVersionSubmodules>true</autoVersionSubmodules>
     <checkstyle.version>8.8</checkstyle.version>
-    <jaeger.version>0.24.0</jaeger.version>
+    <jaeger.version>0.25.0</jaeger.version>
     <junit.version>4.12</junit.version>
     <logback.version>1.2.3</logback.version>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
@@ -111,6 +111,7 @@
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <compilerArgument>-Xlint:deprecation</compilerArgument>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>

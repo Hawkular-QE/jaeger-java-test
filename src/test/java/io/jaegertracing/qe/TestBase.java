@@ -17,11 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.uber.jaeger.metrics.Metrics;
-import com.uber.jaeger.metrics.NullStatsReporter;
-import com.uber.jaeger.metrics.StatsFactoryImpl;
 import com.uber.jaeger.reporters.RemoteReporter;
-import com.uber.jaeger.reporters.Reporter;
 import com.uber.jaeger.samplers.ProbabilisticSampler;
 import com.uber.jaeger.samplers.Sampler;
 import com.uber.jaeger.senders.HttpSender;
@@ -105,10 +101,20 @@ public class TestBase {
                 logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_PORT);
             }
 
-            Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
-            Reporter reporter = new RemoteReporter(sender, JAEGER_FLUSH_INTERVAL, 100, metrics);
+            //Metrics metrics = new Metrics(new StatsFactoryImpl(new NullStatsReporter()));
+            //Reporter reporter = new RemoteReporter(sender, JAEGER_FLUSH_INTERVAL, 100, metrics);
+            RemoteReporter remoteReporter = new RemoteReporter.Builder()
+                    .withSender(sender)
+                    .withFlushInterval(JAEGER_FLUSH_INTERVAL)
+                    //.withMaxQueueSize(JAEGER_MAX_QUEUE_SIZE)
+                    .build();
+
             Sampler sampler = new ProbabilisticSampler(1.0);
-            tracer = new com.uber.jaeger.Tracer.Builder(SERVICE_NAME, reporter, sampler).build();
+            //tracer = new com.uber.jaeger.Tracer.Builder(SERVICE_NAME, reporter, sampler).build();
+            tracer = new com.uber.jaeger.Tracer.Builder(SERVICE_NAME)
+                    .withReporter(remoteReporter)
+                    .withSampler(sampler)
+                    .build();
         }
         return tracer;
     }
