@@ -97,8 +97,8 @@ public class TestBase {
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
                 sender = new HttpSender(httpEndpoint);
             } else {
-                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_PORT, 1024);
                 logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_PORT);
+                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_PORT, 1024);
             }
 
             RemoteReporter remoteReporter = new RemoteReporter.Builder()
