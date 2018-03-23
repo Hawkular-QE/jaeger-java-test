@@ -83,7 +83,7 @@ public class FirstJaegerTest extends TestBase {
     public void spanWithChildrenTest() {
         String operationName = "spanWithChildrenTest" + operationId.getAndIncrement();
         Span parentSpan = tracer().buildSpan(operationName)
-                .withTag("simple", true)
+                .withTag("parent", true)
                 .start();
 
         Span childSpan1 = tracer().buildSpan(operationName + "-child1")
@@ -100,12 +100,17 @@ public class FirstJaegerTest extends TestBase {
 
         childSpan1.finish();
         childSpan2.finish();
-
         parentSpan.finish();
 
-        List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
-        assertEquals("Expected 1 trace", 1, traces.size());
-        List<QESpan> spans = getSpansFromTrace(traces.get(0));
+        List<QESpan> spans;
+        int iteration = 0;
+        do {
+            List<JsonNode> traces = simpleRestClient.getTracesSinceTestStart(testStartTime, 1);
+            assertEquals("Expected 1 trace", 1, traces.size());
+            spans = getSpansFromTrace(traces.get(0));
+            iteration++;
+        } while (iteration < 10 && spans.size() < 3);
+
         assertEquals(3, spans.size());
 
         // TODO validate parent child structure, operationNames, etc.
