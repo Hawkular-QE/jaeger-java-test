@@ -95,10 +95,11 @@ public class SimpleRestClient {
      * @param expectedTraceCount expected number of traces
      * @return a List of traces returned from the Jaeger Query API
      */
-    public List<JsonNode> getTraces(String parameters, int expectedTraceCount) {
+    public List<JsonNode> getTraces(final String parameters, final int expectedTraceCount) {
         waitForFlush();
         List<JsonNode> traces = new ArrayList<>();
         int iterations = 0;
+        long sleepInterval = 1000;
 
         // Retry for up to RETRY_LIMIT seconds to get the expected number of traces
         // TODO make wait time an argument?
@@ -109,7 +110,8 @@ public class SimpleRestClient {
                 return traces;
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(sleepInterval);
+                sleepInterval += 100;
             } catch (InterruptedException e) {
                 logger.warn("Sleep was interrupted", e);
             }
