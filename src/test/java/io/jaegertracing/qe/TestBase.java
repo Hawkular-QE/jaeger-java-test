@@ -58,7 +58,7 @@ public class TestBase {
     private static final String JAEGER_COLLECTOR_PORT = envs.getOrDefault("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268");
     private static Integer JAEGER_FLUSH_INTERVAL = Integer.valueOf(envs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
 
-    private static final String SERVICE_NAME  = envs.getOrDefault("SERVICE_NAME", "qe");
+    private static final String TEST_SERVICE_NAME = envs.getOrDefault("TEST_SERVICE_NAME", "qe");
     private static final String USE_COLLECTOR_OR_AGENT = envs.getOrDefault("USE_COLLECTOR_OR_AGENT", "collector");
 
     private static final Logger logger = LoggerFactory.getLogger(TestBase.class);
@@ -107,7 +107,7 @@ public class TestBase {
                     .build();
 
             Sampler sampler = new ProbabilisticSampler(1.0);
-            tracer = new com.uber.jaeger.Tracer.Builder(SERVICE_NAME)
+            tracer = new com.uber.jaeger.Tracer.Builder(TEST_SERVICE_NAME)
                     .withReporter(remoteReporter)
                     .withSampler(sampler)
                     .build();
