@@ -117,17 +117,6 @@ public class SimpleRestClient {
             }
         }
 
-        if (traces.size() < expectedTraceCount) {
-            // Get ALL traces and print them out
-            logger.error("Didn't find expected number of traces; here are the ones we found");
-            dumpAllTraces(traces);
-
-            logger.error("--------------------------------------------------");
-            logger.error("AND HERE ARE ALL TRACES ");
-            List<JsonNode> allTraces = getTraces("");
-            dumpAllTraces(allTraces);
-        }
-
         return traces;
     }
 
