@@ -14,8 +14,8 @@
 
     <!-- Maven general -->
     <autoVersionSubmodules>true</autoVersionSubmodules>
-    <checkstyle.version>8.8</checkstyle.version>
-    <jaeger.version>0.26.0</jaeger.version>
+    <checkstyle.version>8.9</checkstyle.version>
+    <jaeger.version>0.27.0-RC1</jaeger.version>
     <junit.version>4.12</junit.version>
     <logback.version>1.2.3</logback.version>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
@@ -88,7 +88,7 @@
 
     <!-- Uber Jaeger java opentracing core -->
     <dependency>
-      <groupId>com.uber.jaeger</groupId>
+      <groupId>io.jaegertracing</groupId>
       <artifactId>jaeger-core</artifactId>
       <version>${jaeger.version}</version>
     </dependency>
