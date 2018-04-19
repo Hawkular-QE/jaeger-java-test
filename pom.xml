@@ -86,6 +86,12 @@
       <version>${slf4j.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.opentracing</groupId>
+      <artifactId>opentracing-api</artifactId>
+      <version>0.31.1-SNAPSHOT</version>
+    </dependency>
+
     <!-- Uber Jaeger java opentracing core -->
     <dependency>
       <groupId>io.jaegertracing</groupId>
