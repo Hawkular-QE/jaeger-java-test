@@ -57,9 +57,6 @@ pipeline {
                 checkout scm
                 sh '''
                     ls -alF
-                    #rm ./jaeger-java-test -rf
-                    #git clone https://github.com/Hawkular-QE/jaeger-java-test.git
-                    #cd jaeger-java-test
                     # TODO fail the test if dependencies are not correct
                     mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository dependency:tree
                     export USE_COLLECTOR_OR_AGENT=agent
@@ -70,11 +67,7 @@ pipeline {
         stage('all-in-one: test with collector'){
             steps{
                 sh '''
-                    pwd
                     export USE_COLLECTOR_OR_AGENT=collector
-                    #rm ./jaeger-java-test -rf
-                    #git clone https://github.com/Hawkular-QE/jaeger-java-test.git
-                    #cd jaeger-java-test
                     mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository clean test
                 '''
             }
