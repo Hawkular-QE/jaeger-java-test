@@ -1,0 +1,90 @@
+pipeline {
+    /*  This Jenkinfile is for testing Red Hat productized images of the Jaeger Jave client */
+    agent any
+    options {
+        disableConcurrentBuilds()
+        timeout(time: 1, unit: 'HOURS')
+    }
+    tools {
+        maven 'maven-3.5.3'
+        jdk 'jdk8'
+    }
+    environment {
+        JAEGER_QUERY_HOST="jaeger-query"
+        JAEGER_AGENT_HOST="jaeger-agent"
+        JAEGER_COLLECTOR_HOST="jaeger-collector"
+        JAEGER_PORT_QUERY_HTTP=80
+        JAEGER_PORT_AGENT_ZIPKIN_THRIFT=5775
+        JAEGER_PORT_AGENT_COMPACT=6831
+        JAEGER_PORT_AGENT_BINARY=6832
+        JAEGER_PORT_ZIPKIN_COLLECTOR=14268
+    }
+    parameters {
+        string(name: 'JAEGER_REPOSITORY_URL', defaultValue: 'http://download-node-02.eng.bos.redhat.com/rcm-guest/staging/jaeger/jaeger-1.0.0.ER1/jaeger-1.0.0.ER1-maven-repository.zip', description: 'Source of Jaeger Images')
+        string(name: 'JAEGER_CLENT_VERSION', defaultValue: '0.27.0.redhat-3', description: 'Jaeger Client Version')
+    }
+    stages {
+        stage('Clean all') {
+            steps {
+                sh 'oc delete all,template,daemonset,configmap -l jaeger-infra || true'
+                sh 'env | sort'
+            }
+        }
+        stage('Get Red Hat Images') {
+            steps {
+                sh '''
+                    pushd /tmp
+                    rm -rf jaeger
+                    mkdir jaeger
+                    cd jaeger
+                    curl ${JAEGER_REPOSITORY_URL} --output jaeger-maven-repository.zip
+                    unzip jaeger-maven-repository.zip
+                    ls -alF maven-repository
+                    popd
+                '''
+            }
+        }
+        stage('all-in-one: deploy Jaeger') {
+            steps {
+                sh 'oc process -f https://raw.githubusercontent.com/jaegertracing/jaeger-openshift/master/all-in-one/jaeger-all-in-one-template.yml | oc create -f -'
+                openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-query', verbose: 'false'
+                openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-collector', verbose: 'false'
+            }
+        }
+        stage('all-in-one: test with agent'){
+            steps{
+                sh '''
+
+                    deleteDir()
+                    checkout scm
+                    sh 'ls -alF'
+                    #rm ./jaeger-java-test -rf
+                    #git clone https://github.com/Hawkular-QE/jaeger-java-test.git
+                    #cd jaeger-java-test
+                    # TODO fail the test if dependencies are not correct
+                    mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository dependency:tree
+                    export USE_COLLECTOR_OR_AGENT=agent
+                    mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository clean test
+                '''
+            }
+        }
+        stage('all-in-one: test with collector'){
+            steps{
+                sh '''
+                    pwd
+                    export USE_COLLECTOR_OR_AGENT=collector
+                    #rm ./jaeger-java-test -rf
+                    #git clone https://github.com/Hawkular-QE/jaeger-java-test.git
+                    #cd jaeger-java-test
+                    mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository clean test
+                '''
+            }
+        }
+
+        stage('all-in-one: delete all') {
+            steps {
+                sh 'oc delete all,template,daemonset,configmap -l jaeger-infra || true'
+            }
+        }
+    }
+}
