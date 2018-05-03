@@ -21,7 +21,7 @@ pipeline {
     }
     parameters {
         string(name: 'JAEGER_REPOSITORY_URL', defaultValue: 'http://download-node-02.eng.bos.redhat.com/rcm-guest/staging/jaeger/jaeger-1.0.0.ER1/jaeger-1.0.0.ER1-maven-repository.zip', description: 'Source of Jaeger Images')
-        string(name: 'JAEGER_CLENT_VERSION', defaultValue: '0.27.0.redhat-4', description: 'Jaeger Client Version')
+        string(name: 'JAEGER_CLENT_VERSION', defaultValue: '0.27.0.redhat-3', description: 'Jaeger Client Version')
     }
     stages {
         stage('Clean all') {
