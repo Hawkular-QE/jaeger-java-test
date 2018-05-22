@@ -1,5 +1,5 @@
 pipeline {
-    /*  This Jenkinfile is for testing Red Hat productized images of the Jaeger Jave client */
+    /*  This Jenkinfile is for testing Red Hat productized images of the Jaeger Java client */
     agent any
     options {
         disableConcurrentBuilds()
@@ -57,7 +57,6 @@ pipeline {
                 checkout scm
                 sh '''
                     ls -alF
-                    # TODO fail the test if dependencies are not correct
                     mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository dependency:tree
                     export USE_COLLECTOR_OR_AGENT=agent
                     mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository clean test
