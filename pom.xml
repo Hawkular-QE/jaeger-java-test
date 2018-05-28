@@ -12,9 +12,9 @@
 
   <properties>
     <!-- Dependencies -->
-    <checkstyle.version>8.10</checkstyle.version>
+    <checkstyle.version>8.10.1</checkstyle.version>
     <htmlunit.version>2.31</htmlunit.version>
-    <jaeger.version>0.27.0</jaeger.version>
+    <jaeger.version>0.28.0</jaeger.version>
     <junit.version>4.12</junit.version>
     <logback.version>1.2.3</logback.version>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
