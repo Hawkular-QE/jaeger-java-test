@@ -75,10 +75,10 @@ pipeline {
             steps{
                 sh 'rm -rf jaeger-metrics-smoke-test'
                 git 'https://github.com/Kiali-QE/jaeger-metrics-smoke-test.git'
+                sh 'mvn --activate-profiles openshift -DskipITs clean fabric8:deploy'
+                openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-micrometer-smoke-tests', verbose: 'false'
                 sh '''
-                    mvn --activate-profiles openshift -DskipITs clean fabric8:deploy
                     export TARGET_URL="http://"`oc get route jaeger-micrometer-smoke-tests --output=go-template={{.spec.host}}`
-                    sleep 20
                     mvn verify
                     mvn  --activate-profiles openshift fabric8:undeploy || true
                 '''
