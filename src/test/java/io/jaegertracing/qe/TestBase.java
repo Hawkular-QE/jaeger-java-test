@@ -95,7 +95,8 @@ public class TestBase {
             if (USE_COLLECTOR_OR_AGENT.equals("collector")) {
                 String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_COLLECTOR_PORT + "/api/traces";
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
-                sender = new HttpSender(httpEndpoint);
+                sender = new HttpSender.Builder(httpEndpoint)
+                    .build();
             } else {
                 logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_PORT);
                 sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_PORT, 1024);
