@@ -79,8 +79,9 @@ pipeline {
                 openshiftVerifyService apiURL: '', authToken: '', namespace: '', svcName: 'jaeger-micrometer-smoke-tests', verbose: 'false'
                 sh '''
                     export TARGET_URL="http://"`oc get route jaeger-micrometer-smoke-tests --output=go-template={{.spec.host}}`
-                    mvn verify
-                    mvn  --activate-profiles openshift fabric8:undeploy || true
+                    mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository dependency:tree
+                    mvn -Djaeger.local.repository.url=file:///tmp/jaeger/maven-repository -Djaeger.version=${JAEGER_CLENT_VERSION} --activate-profiles jaeger-repository,jboss-ga-repository verify
+                    mvn --activate-profiles openshift fabric8:undeploy || true
                 '''
             }
         }
