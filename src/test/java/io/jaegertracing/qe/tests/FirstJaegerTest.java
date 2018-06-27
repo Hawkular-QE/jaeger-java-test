@@ -14,7 +14,6 @@
 package io.jaegertracing.qe.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +29,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +71,6 @@ public class FirstJaegerTest extends TestBase {
         assertTrue(receivedSpan.getTags().size() >= 3);
         myAssertTag(receivedSpan.getTags(), "simple", true);
     }
-
 
     /**
      * Simple test of creating a span with children
@@ -120,7 +117,7 @@ public class FirstJaegerTest extends TestBase {
      * A simple test of the start and end options when fetching traces.
      *
      */
-    @Ignore("See https://github.com/Hawkular-QE/jaeger-java-test/issues/14")
+    //@Ignore("See https://github.com/Hawkular-QE/jaeger-java-test/issues/14")
     @Test
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
