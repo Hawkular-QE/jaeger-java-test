@@ -6,18 +6,17 @@ pipeline {
         Currently we need the ip address of the jaeger-agent pod on istio-system in order to find it, and
         that needs to be entered as a parameter when this job is run.  If possible we should update this
         script and find it programatically.
-
     */
 
-    agent { label 'mvn' }
+    agent any
     options {
         disableConcurrentBuilds()
         timeout(time: 1, unit: 'HOURS')
     }
-    /*tools {
+    tools {
         maven 'maven-3.5.3'
         jdk 'jdk8'
-    }*/
+    }
     environment {
         JAEGER_QUERY_HOST="jaeger-query.istio-system"
         JAEGER_COLLECTOR_HOST="jaeger-collector.istio-system"
@@ -37,7 +36,6 @@ pipeline {
                 sh 'oc whoami'
                 sh 'oc status'
                 script {
-                /* TODO do I need permissions to do this? */
                     openshift.withCluster("") {
                         openshift.withProject('istio-system') {
                             sh 'oc get pods'
