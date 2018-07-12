@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +118,7 @@ public class FirstJaegerTest extends TestBase {
      * A simple test of the start and end options when fetching traces.
      *
      */
-    //@Ignore("See https://github.com/Hawkular-QE/jaeger-java-test/issues/14")
+    @Ignore("See https://github.com/Hawkular-QE/jaeger-java-test/issues/14")
     @Test
     public void testStartEndTest() {
         String operationName = "startEndTest" + operationId.getAndIncrement();
