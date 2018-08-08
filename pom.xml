@@ -14,7 +14,7 @@
     <!-- Dependencies -->
     <checkstyle.version>8.10.1</checkstyle.version>
     <htmlunit.version>2.31</htmlunit.version>
-    <jaeger.version>0.29.0</jaeger.version>
+    <jaeger.version>0.30.1.redhat-00004</jaeger.version>
     <junit.version>4.12</junit.version>
     <logback.version>1.2.3</logback.version>
     <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
@@ -94,7 +94,7 @@
     <!-- Uber Jaeger java opentracing core -->
     <dependency>
       <groupId>io.jaegertracing</groupId>
-      <artifactId>jaeger-core</artifactId>
+      <artifactId>jaeger-client</artifactId>
       <version>${jaeger.version}</version>
     </dependency>
 
@@ -264,5 +264,17 @@
     </profile>
   </profiles>
 
+	<repositories>
+	  <repository>
+	    <id>indy</id>
+	    <name>indy</name>
+	    <url>http://indy.cloud.pnc.engineering.redhat.com/api/content/maven/group/pnc-builds</url>
+	  </repository>
+	  <repository>
+	    <id>rhrepo-ea</id>
+	    <name>rhrepo-ea</name>
+	    <url>http://maven.repository.redhat.com/earlyaccess/all</url>
+	  </repository>
+	</repositories>
 
 </project>
