@@ -17,12 +17,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.jaegertracing.reporters.RemoteReporter;
-import io.jaegertracing.samplers.ProbabilisticSampler;
-import io.jaegertracing.samplers.Sampler;
-import io.jaegertracing.senders.HttpSender;
-import io.jaegertracing.senders.Sender;
-import io.jaegertracing.senders.UdpSender;
+
+import io.jaegertracing.Configuration.SenderConfiguration;
+import io.jaegertracing.internal.JaegerTracer;
+import io.jaegertracing.internal.reporters.RemoteReporter;
+import io.jaegertracing.internal.samplers.ProbabilisticSampler;
+import io.jaegertracing.spi.Sampler;
 import io.opentracing.Tracer;
 
 import java.time.Instant;
@@ -54,7 +54,7 @@ public class TestBase {
     private static Map<String, String> envs = System.getenv();
     private static final String JAEGER_AGENT_HOST = envs.getOrDefault("JAEGER_AGENT_HOST", "jaeger-agent");
     private static final Integer JAEGER_AGENT_PORT = Integer.valueOf(envs.getOrDefault("JAEGER_AGENT_PORT", "6831"));
-    private static final String JAEGER_COLLECTOR_HOST  = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "jaeger-collector");
+    private static final String JAEGER_COLLECTOR_HOST = envs.getOrDefault("JAEGER_COLLECTOR_HOST", "jaeger-collector");
     private static final String JAEGER_COLLECTOR_PORT = envs.getOrDefault("JAEGER_PORT_ZIPKIN_COLLECTOR", "14268");
     private static Integer JAEGER_FLUSH_INTERVAL = Integer.valueOf(envs.getOrDefault("JAEGER_FLUSH_INTERVAL", "1000"));
 
@@ -85,30 +85,32 @@ public class TestBase {
     public void myAssertTag(Map<String, Object> tags, String key, Object expectedValue) {
         assertTrue("Could not find key: " + key, tags.containsKey(key));
         Object actualValue = tags.get(key);
-        assertEquals("Wrong value for key " + key + " expected " + expectedValue.toString(), expectedValue, actualValue);
+        assertEquals("Wrong value for key " + key + " expected " + expectedValue.toString(), expectedValue,
+                actualValue);
     }
 
     public Tracer tracer() {
-        Sender sender;
-
         if (tracer == null) {
+            SenderConfiguration conf = null;
+
             if (USE_COLLECTOR_OR_AGENT.equals("collector")) {
                 String httpEndpoint = "http://" + JAEGER_COLLECTOR_HOST + ":" + JAEGER_COLLECTOR_PORT + "/api/traces";
                 logger.info("Using collector endpoint [" + httpEndpoint + "]");
-                sender = new HttpSender.Builder(httpEndpoint)
-                    .build();
+                conf = new SenderConfiguration()
+                        .withEndpoint(httpEndpoint);
             } else {
                 logger.info("Using JAEGER agent on host " + JAEGER_AGENT_HOST + " port " + JAEGER_AGENT_PORT);
-                sender = new UdpSender(JAEGER_AGENT_HOST, JAEGER_AGENT_PORT, 1024);
+                conf = new SenderConfiguration()
+                        .withAgentHost(JAEGER_AGENT_HOST)
+                        .withAgentPort(JAEGER_AGENT_PORT);
             }
-
             RemoteReporter remoteReporter = new RemoteReporter.Builder()
-                    .withSender(sender)
+                    .withSender(conf.getSender())
                     .withFlushInterval(JAEGER_FLUSH_INTERVAL)
                     .build();
 
             Sampler sampler = new ProbabilisticSampler(1.0);
-            tracer = new io.jaegertracing.Tracer.Builder(TEST_SERVICE_NAME)
+            tracer = new JaegerTracer.Builder(TEST_SERVICE_NAME)
                     .withReporter(remoteReporter)
                     .withSampler(sampler)
                     .build();
@@ -129,7 +131,6 @@ public class TestBase {
         }
     }
 
-
     /**
      *
      * @param spans List of spans from a given trace
@@ -144,7 +145,6 @@ public class TestBase {
         }
         return null;
     }
-
 
     /**
      * Convert all JSON Spans in the trace returned by the Jaeeger Rest API to QESpans
@@ -179,7 +179,7 @@ public class TestBase {
             String key = jsonTag.get("key").asText();
             String tagType = jsonTag.get("type").asText();
             switch (tagType) {
-                case "bool" :
+                case "bool":
                     boolean b = jsonTag.get("value").asBoolean();
                     tags.put(key, b);
                     break;
@@ -191,7 +191,7 @@ public class TestBase {
                     Integer i = jsonTag.get("value").asInt();
                     tags.put(key, i);
                     break;
-                case "string" :
+                case "string":
                     String s = jsonTag.get("value").asText();
                     tags.put(key, s);
                     break;
