@@ -264,17 +264,22 @@
     </profile>
   </profiles>
 
-	<repositories>
-	  <repository>
-	    <id>indy</id>
-	    <name>indy</name>
-	    <url>http://indy.cloud.pnc.engineering.redhat.com/api/content/maven/group/pnc-builds</url>
-	  </repository>
-	  <repository>
-	    <id>rhrepo-ea</id>
-	    <name>rhrepo-ea</name>
-	    <url>http://maven.repository.redhat.com/earlyaccess/all</url>
-	  </repository>
-	</repositories>
+  <repositories>
+    <repository>
+      <id>indy</id>
+      <name>indy</name>
+      <url>http://indy.cloud.pnc.engineering.redhat.com/api/content/maven/group/pnc-builds</url>
+    </repository>
+    <repository>
+      <id>rhrepo-ea</id>
+      <name>rhrepo-ea</name>
+      <url>http://maven.repository.redhat.com/earlyaccess/all</url>
+    </repository>
+    <repository>
+      <id>rhrepo-eap</id>
+      <name>rhrepo-eap</name>
+      <url>http://download-node-02.eng.bos.redhat.com/brewroot/repos/jb-eap-7.2-maven-build/latest/maven</url>
+    </repository>
+  </repositories>
 
 </project>
